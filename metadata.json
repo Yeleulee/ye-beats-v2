@@ -1,0 +1,10 @@
+
+{
+  "name": "Ye Beats V2",
+  "description": "A high-fidelity, social-first music streaming platform that unifies official studio tracks with the deep archive of live sets and remixes from YouTube.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone",
+    "geolocation"
+  ]
+}
