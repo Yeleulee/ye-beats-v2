@@ -12,7 +12,8 @@ export const MOCK_TRACKS: Track[] = [
     duration: 368,
     heatmap: [0.1, 0.2, 0.5, 0.8, 0.9, 0.4, 0.3, 0.6, 1.0, 0.7, 0.3, 0.2],
     samples: [],
-    isSampledIn: []
+    isSampledIn: [],
+    videoId: 'K5LqYewA_ec'
   },
   {
     id: '2',
@@ -24,7 +25,8 @@ export const MOCK_TRACKS: Track[] = [
     duration: 275,
     heatmap: [0.3, 0.4, 0.6, 0.7, 0.5, 0.8, 0.9, 1.0, 0.9, 0.8, 0.7, 0.6],
     samples: [],
-    isSampledIn: []
+    isSampledIn: [],
+    videoId: 'Cx0zObxA8NE'
   },
   {
     id: '3',
@@ -36,7 +38,8 @@ export const MOCK_TRACKS: Track[] = [
     duration: 472,
     heatmap: [0.3, 0.4, 0.6, 0.7, 0.5, 0.8, 0.9, 1.0, 0.9, 0.8, 0.7, 0.6],
     samples: [],
-    isSampledIn: ['Night Tempo - Plastic Love Edit']
+    isSampledIn: ['Night Tempo - Plastic Love Edit'],
+    videoId: '9Gj47G2e1Jc'
   },
   {
     id: '4',
@@ -48,7 +51,8 @@ export const MOCK_TRACKS: Track[] = [
     duration: 200,
     heatmap: [0.2, 0.5, 0.9, 1.0, 0.8, 0.4, 0.3, 0.6, 0.8, 0.9, 0.5, 0.2],
     samples: [],
-    isSampledIn: []
+    isSampledIn: [],
+    videoId: '4NRXx6U8ABQ'
   },
   {
     id: '5',
@@ -60,7 +64,8 @@ export const MOCK_TRACKS: Track[] = [
     duration: 243,
     heatmap: [0.1, 0.3, 0.7, 0.9, 1.0, 0.8, 0.6, 0.4, 0.3, 0.2, 0.2, 0.1],
     samples: [],
-    isSampledIn: []
+    isSampledIn: [],
+    videoId: 'dX3k_QDnzHE'
   },
   {
     id: '6',
@@ -72,7 +77,8 @@ export const MOCK_TRACKS: Track[] = [
     duration: 215,
     heatmap: [0.4, 0.5, 0.6, 0.8, 0.9, 1.0, 0.9, 0.7, 0.5, 0.4, 0.3, 0.2],
     samples: [],
-    isSampledIn: []
+    isSampledIn: [],
+    videoId: 'XXYlFuWEuKI'
   }
 ];
 
