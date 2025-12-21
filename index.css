@@ -1,0 +1,51 @@
+:root {
+  --oled-black: #000000;
+  --nav-height: 84px;
+  --player-height: 72px;
+}
+
+body {
+  background-color: var(--oled-black);
+  color: #ffffff;
+  font-family: "Inter", "Roboto Flex", sans-serif;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  height: 100vh;
+  width: 100vw;
+}
+
+.brand-cursive {
+  font-family: "Dancing Script", cursive;
+}
+
+* {
+  -webkit-tap-highlight-color: transparent;
+  box-sizing: border-box;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.safe-bottom-mobile {
+  padding-bottom: calc(var(--nav-height) + var(--player-height) + 40px);
+}
+
+.safe-bottom-desktop {
+  padding-bottom: 140px;
+}
