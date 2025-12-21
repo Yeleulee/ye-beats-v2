@@ -601,16 +601,17 @@ const App: React.FC = () => {
       )}
 
       {/* Hidden React Player */}
-      {/* Hidden React Player (Must be technically 'visible' for YouTube API to work) */}
-      <div className="fixed bottom-0 right-0 w-1 h-1 opacity-0 pointer-events-none overflow-hidden z-[-1]">
+      {/* Hidden React Player (Must meet YouTube's 200x200px requirement) */}
+      <div className="fixed bottom-0 left-[-1000px] w-[200px] h-[200px] opacity-0 pointer-events-none overflow-hidden z-[-1]">
         <ReactPlayer
           ref={playerRef}
           url={currentTrack.videoId ? `https://www.youtube.com/watch?v=${currentTrack.videoId}` : undefined}
           playing={isPlaying}
           volume={volume}
           playbackRate={playbackSpeed}
-          onProgress={({ played }) => setProgress(played)}
+          onProgress={(state: any) => setProgress(state.played)}
           onEnded={handleNext}
+          onError={(e) => console.error("YouTube Player Error:", e)}
           width="100%"
           height="100%"
           config={{
@@ -620,10 +621,11 @@ const App: React.FC = () => {
                 controls: 0, 
                 autoplay: 1,
                 playsinline: 1,
-                origin: window.location.origin 
+                origin: window.location.origin,
+                enablejsapi: 1
               }
             }
-          }}
+          } as any}
         />
       </div>
     </div>
