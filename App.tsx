@@ -1,9 +1,10 @@
 
-
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import ReactPlayer from 'react-player';
 import { Home, PlaySquare, Radio, Library, Search, Bell, Settings, Mic, Play, LogOut, User as UserIcon, CheckCircle2, Plus, Music2 } from 'lucide-react';
 import { Track, AudioMode } from './types';
 import { MOCK_TRACKS, MOCK_FRIENDS } from './constants';
+import { searchMusic, YouTubeTrack } from './services/youtubeService';
 import BottomPlayer from './components/BottomPlayer';
 import NowPlaying from './components/NowPlaying';
 import GreenRoom from './components/GreenRoom';
@@ -21,14 +22,51 @@ const App: React.FC = () => {
   const [autoOpenQueue, setAutoOpenQueue] = useState(false);
   const [activeTab, setActiveTab] = useState<'home' | 'new' | 'radio' | 'library' | 'search'>('home');
   
-  const [progress, setProgress] = useState(0.35);
+  const [progress, setProgress] = useState(0);
   const [volume, setVolume] = useState(0.8);
   const [isShuffle, setIsShuffle] = useState(false);
   const [repeatMode, setRepeatMode] = useState<0 | 1 | 2>(0);
   const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
+  
+  const playerRef = useRef<any>(null);
+
+  const handleSeek = (val: number) => {
+    setProgress(val);
+    playerRef.current?.seekTo(val);
+  };
 
   const [queue, setQueue] = useState<Track[]>(MOCK_TRACKS.slice(1));
   const [toast, setToast] = useState<{ message: string; visible: boolean }>({ message: '', visible: false });
+
+  // Search State
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState<Track[]>([]);
+  const [isSearching, setIsSearching] = useState(false);
+
+  const handleSearch = async (query: string) => {
+    if (!query.trim()) return;
+    
+    setIsSearching(true);
+    try {
+      const results = await searchMusic(query);
+      const convertedResults: Track[] = results.map(ytTrack => ({
+        id: ytTrack.id,
+        title: ytTrack.title,
+        artist: ytTrack.artist,
+        album: ytTrack.album,
+        coverArt: ytTrack.coverArt,
+        duration: 180, // Default or fetch detail
+        videoId: ytTrack.videoId,
+        isLossless: false
+      }));
+      setSearchResults(convertedResults);
+    } catch (error) {
+      console.error("Search failed:", error);
+      showToast("Search failed. Please try again.");
+    } finally {
+      setIsSearching(false);
+    }
+  };
 
   const showToast = useCallback((message: string) => {
     setToast({ message, visible: true });
@@ -110,23 +148,6 @@ const App: React.FC = () => {
     setIsExpanded(true);
   };
 
-  useEffect(() => {
-    let interval: number;
-    if (isPlaying) {
-      interval = window.setInterval(() => {
-        setProgress((prev) => {
-          if (prev >= 1) {
-            if (repeatMode === 2) return 0;
-            handleNext();
-            return 0;
-          }
-          const increment = (1 / currentTrack.duration) * playbackSpeed;
-          return prev + increment;
-        });
-      }, 1000);
-    }
-    return () => clearInterval(interval);
-  }, [isPlaying, repeatMode, handleNext, playbackSpeed, currentTrack.duration]);
 
   if (!isAuthenticated) {
     return <LandingPage onLogin={handleLogin} />;
@@ -156,55 +177,74 @@ const App: React.FC = () => {
               <div className="relative group">
                 <input 
                   type="text" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      handleSearch(searchQuery);
+                    }
+                  }}
                   placeholder="Search for artists, songs, albums..."
                   className="w-full bg-zinc-900/50 border border-white/10 px-16 py-6 rounded-[32px] text-xl text-white focus:outline-none focus:ring-2 focus:ring-red-600/40 focus:border-red-600/40 transition-all placeholder:text-zinc-700 font-['Roboto_Flex'] font-medium backdrop-blur-xl"
                 />
                 <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-red-600 transition-colors" size={28} />
+                {isSearching && (
+                  <div className="absolute right-6 top-1/2 -translate-y-1/2">
+                    <div className="w-6 h-6 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                  </div>
+                )}
               </div>
 
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h2 className="text-2xl font-black tracking-tight text-white font-['Inter'] uppercase">Recent Searches</h2>
-                  <div className="h-px flex-1 bg-white/5" />
+              {searchResults.length > 0 ? (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <h2 className="text-2xl font-black tracking-tight text-white font-['Inter'] uppercase">Results</h2>
+                    <div className="h-px flex-1 bg-white/5" />
+                  </div>
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                    {searchResults.map((track) => (
+                      <div 
+                        key={track.id}
+                        onClick={() => handleTrackSelect(track)}
+                        className="bg-zinc-900/40 hover:bg-zinc-800/60 p-5 rounded-[32px] cursor-pointer transition-all border border-white/5 group"
+                      >
+                        <img 
+                          src={track.coverArt} 
+                          alt={`${track.title} by ${track.artist}`}
+                          className="w-full aspect-square rounded-[24px] mb-4 object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                        <h3 className="font-black text-lg text-white truncate mb-1 font-['Inter'] uppercase leading-none">{track.title}</h3>
+                        <p className="text-zinc-600 font-black text-xs uppercase tracking-[0.3em] truncate font-['Roboto_Flex']">{track.artist}</p>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-3">
-                  {['The Weeknd', 'Blinding Lights', 'Kiss Land', 'After Hours'].map((term) => (
-                    <button 
-                      key={term}
-                      className="px-6 py-3 bg-white/5 border border-white/10 rounded-[20px] text-sm font-black text-zinc-400 hover:text-white hover:bg-white/10 transition-all font-['Roboto_Flex'] uppercase tracking-[0.2em]"
-                    >
-                      {term}
-                    </button>
-                  ))}
+              ) : (
+                <div className="space-y-6">
+                  <div className="flex items-center gap-4">
+                    <h2 className="text-2xl font-black tracking-tight text-white font-['Inter'] uppercase">Recent Searches</h2>
+                    <div className="h-px flex-1 bg-white/5" />
+                  </div>
+                  <div className="flex flex-wrap gap-3">
+                    {['The Weeknd', 'Blinding Lights', 'Kiss Land', 'After Hours'].map((term) => (
+                      <button 
+                        key={term}
+                        onClick={() => {
+                          setSearchQuery(term);
+                          handleSearch(term);
+                        }}
+                        className="px-6 py-3 bg-white/5 border border-white/10 rounded-[20px] text-sm font-black text-zinc-400 hover:text-white hover:bg-white/10 transition-all font-['Roboto_Flex'] uppercase tracking-[0.2em]"
+                      >
+                        {term}
+                      </button>
+                    ))}
+                  </div>
                 </div>
-              </div>
-
-              <div className="space-y-6">
-                <div className="flex items-center gap-4">
-                  <h2 className="text-2xl font-black tracking-tight text-white font-['Inter'] uppercase">Browse All</h2>
-                  <div className="h-px flex-1 bg-white/5" />
-                </div>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                  {MOCK_TRACKS.slice(0, 6).map((track) => (
-                    <div 
-                      key={track.id}
-                      onClick={() => handleTrackSelect(track)}
-                      className="bg-zinc-900/40 hover:bg-zinc-800/60 p-5 rounded-[32px] cursor-pointer transition-all border border-white/5 group"
-                    >
-                      <img 
-                        src={track.coverArt} 
-                        alt={`${track.title} by ${track.artist}`}
-                        className="w-full aspect-square rounded-[24px] mb-4 object-cover group-hover:scale-105 transition-transform duration-500"
-                      />
-                      <h3 className="font-black text-lg text-white truncate mb-1 font-['Inter'] uppercase leading-none">{track.title}</h3>
-                      <p className="text-zinc-600 font-black text-xs uppercase tracking-[0.3em] truncate font-['Roboto_Flex']">{track.artist}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              )}
             </div>
           </div>
         );
+
       case 'library':
       default:
         return (
@@ -446,7 +486,7 @@ const App: React.FC = () => {
               onToggleMode={setAudioMode}
               onExpand={handleExpandPlayer}
               progress={progress}
-              setProgress={setProgress}
+              setProgress={handleSeek}
               volume={volume}
               setVolume={setVolume}
               isShuffle={isShuffle}
@@ -483,7 +523,7 @@ const App: React.FC = () => {
                       activeTab === tab.id 
                         ? 'text-red-500 drop-shadow-[0_2px_8px_rgba(255,0,0,0.6)]' 
                         : 'text-zinc-600'
-                    }`} 
+                    }`}
                     size={22}
                     strokeWidth={activeTab === tab.id ? 2.5 : 2}
                   />
@@ -503,7 +543,7 @@ const App: React.FC = () => {
       </div>
 
       <div className="hidden lg:block fixed bottom-12 left-[calc(50%+170px)] -translate-x-1/2 w-[calc(100%-700px)] z-[80]">
-        <BottomPlayer 
+        <BottomPlayer
           currentTrack={currentTrack}
           isPlaying={isPlaying}
           onPlayPause={handlePlayPause}
@@ -513,7 +553,7 @@ const App: React.FC = () => {
           onToggleMode={setAudioMode}
           onExpand={handleExpandPlayer}
           progress={progress}
-          setProgress={setProgress}
+          setProgress={handleSeek}
           volume={volume}
           setVolume={setVolume}
           isShuffle={isShuffle}
@@ -525,16 +565,16 @@ const App: React.FC = () => {
       </div>
 
       {isExpanded && (
-        <NowPlaying 
-          track={currentTrack} 
-          audioMode={audioMode} 
+        <NowPlaying
+          track={currentTrack}
+          audioMode={audioMode}
           onClose={() => setIsExpanded(false)}
           isPlaying={isPlaying}
           onPlayPause={handlePlayPause}
           onNext={handleNext}
           onPrevious={handlePrevious}
           progress={progress}
-          setProgress={setProgress}
+          setProgress={handleSeek}
           volume={volume}
           setVolume={setVolume}
           isShuffle={isShuffle}
@@ -559,6 +599,26 @@ const App: React.FC = () => {
           initialQueueOpen={autoOpenQueue}
         />
       )}
+
+      {/* Hidden React Player */}
+      <div className="hidden">
+        <ReactPlayer
+          ref={playerRef}
+          url={currentTrack.videoId ? `https://www.youtube.com/watch?v=${currentTrack.videoId}` : undefined}
+          playing={isPlaying}
+          volume={volume}
+          playbackRate={playbackSpeed}
+          onProgress={({ played }) => setProgress(played)}
+          onEnded={handleNext}
+          width="0"
+          height="0"
+          config={{
+            youtube: {
+              playerVars: { showinfo: 0, controls: 0, autoplay: 1 }
+            }
+          }}
+        />
+      </div>
     </div>
   );
 };

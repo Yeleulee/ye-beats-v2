@@ -60,33 +60,10 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
   const [samplesLoading, setSamplesLoading] = useState(false);
   const [sampleData, setSampleData] = useState<{samples: string[], sampledBy: string[]} | null>(null);
   const volumeRef = useRef<HTMLDivElement>(null);
-  const audioRef = useRef<HTMLAudioElement>(null);
+
   const [isDraggingVolume, setIsDraggingVolume] = useState(false);
 
   // Sync volume with audio element
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume;
-    }
-  }, [volume]);
-
-  // Sync play/pause with audio element
-  useEffect(() => {
-    if (audioRef.current) {
-      if (isPlaying) {
-        audioRef.current.play().catch(e => console.log('Audio play failed:', e));
-      } else {
-        audioRef.current.pause();
-      }
-    }
-  }, [isPlaying]);
-
-  // Update audio playback speed
-  useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.playbackRate = playbackSpeed;
-    }
-  }, [playbackSpeed]);
 
   const fetchSamples = async () => {
     // AI-powered sample detection has been disabled
@@ -167,11 +144,6 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
   return (
     <div className="fixed inset-0 bg-gradient-to-b from-transparent via-black/60 to-black z-[100] animate-in slide-in-from-bottom duration-500 flex flex-col overflow-hidden select-none backdrop-blur-xl">
       {/* Hidden audio element for playback */}
-      <audio 
-        ref={audioRef}
-        src={`https://www.soundhelix.com/examples/mp3/SoundHelix-Song-${(parseInt(track.id) % 16) + 1}.mp3`}
-        loop={repeatMode === 2}
-      />
       
       <header className="p-8 flex justify-between items-center z-10">
         <button onClick={onClose} className="p-3 hover:bg-white/10 rounded-full transition-all active:scale-75 text-zinc-400 hover:text-white">

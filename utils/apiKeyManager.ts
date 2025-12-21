@@ -38,6 +38,11 @@ class APIKeyManager {
       import.meta.env.VITE_YOUTUBE_API_KEY_3,
       import.meta.env.VITE_YOUTUBE_API_KEY_4,
       import.meta.env.VITE_YOUTUBE_API_KEY_5,
+      import.meta.env.VITE_YOUTUBE_API_KEY_6,
+      import.meta.env.VITE_YOUTUBE_API_KEY_7,
+      import.meta.env.VITE_YOUTUBE_API_KEY_8,
+      import.meta.env.VITE_YOUTUBE_API_KEY_9,
+      import.meta.env.VITE_YOUTUBE_API_KEY_10,
     ].filter(Boolean) as string[];
 
     if (envKeys.length === 0) {
