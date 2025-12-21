@@ -68,20 +68,29 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
         else if (hour < 18) timeBasedArtist = 'Polo G focus'; // Afternoon
         else timeBasedArtist = 'The Weeknd chill'; // Evening
 
-        // Fetch all data in parallel
-        const [
-          trendingData,
-          timeBasedData,
-          recentData,
-          ethiopianPodcasts,
-          popularPodcasts
-        ] = await Promise.all([
+        // Fetch all data in parallel with individual error handling
+        const results = await Promise.allSettled([
           fetchTrendingMusic(10),
           fetchArtistTracks(timeBasedArtist, 6),
           fetchArtistTracks('Drake recent hits', 10),
           fetchEthiopianPodcasts(),
           fetchPopularPodcasts()
         ]);
+
+        // Extract successful results
+        const trendingData = results[0].status === 'fulfilled' ? results[0].value : [];
+        const timeBasedData = results[1].status === 'fulfilled' ? results[1].value : [];
+        const recentData = results[2].status === 'fulfilled' ? results[2].value : [];
+        const ethiopianPodcasts = results[3].status === 'fulfilled' ? results[3].value : [];
+        const popularPodcasts = results[4].status === 'fulfilled' ? results[4].value : [];
+
+        // Log any failures
+        results.forEach((result, index) => {
+          if (result.status === 'rejected') {
+            const labels = ['Trending', 'Time-based', 'Recent', 'Ethiopian Podcasts', 'Popular Podcasts'];
+            console.warn(`⚠️ Failed to fetch ${labels[index]}:`, result.reason);
+          }
+        });
 
         // Convert YouTube tracks to Track format
         const convertedTrending = trendingData?.map(convertYouTubeTrackToTrack) || [];
@@ -100,7 +109,7 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
           color: 'from-purple-600/80 to-pink-600/80' // Default color
         }));
 
-        // Update state with real data
+        // Update state with real data (fallback to mock only if no data)
         setTrendingTracks(convertedTrending.length > 0 ? convertedTrending : MOCK_TRACKS);
         setTimeBasedTracks(convertedTimeBased.length > 0 ? convertedTimeBased : MOCK_TRACKS);
         setRecentlyPlayedTracks(convertedRecent.length > 0 ? convertedRecent : MOCK_TRACKS);

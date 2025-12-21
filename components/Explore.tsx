@@ -22,11 +22,23 @@ const Explore: React.FC<ExploreProps> = ({ onPlayTrack }) => {
         setIsLoading(true);
         console.log('🌍 Fetching Explore page data...');
         
-        const [global, tokyo, newReleases] = await Promise.all([
+        const results = await Promise.allSettled([
           fetchTrendingMusic(20),
           searchMusic('City Pop Tokyo', 10),
           searchMusic('new music 2025', 10)
         ]);
+
+        const global = results[0].status === 'fulfilled' ? results[0].value : [];
+        const tokyo = results[1].status === 'fulfilled' ? results[1].value : [];
+        const newReleases = results[2].status === 'fulfilled' ? results[2].value : [];
+
+        // Log failures
+        results.forEach((result, index) => {
+          if (result.status === 'rejected') {
+            const labels = ['Global', 'Tokyo', 'New Releases'];
+            console.warn(`⚠️ Failed to fetch ${labels[index]}:`, result.reason);
+          }
+        });
 
         setGlobalTracks(global || []);
         setTokyoTracks(tokyo || []);
