@@ -29,6 +29,47 @@ export interface Podcast {
 }
 
 /**
+ * Helper to parse ISO 8601 duration (e.g. PT1H2M10S) to seconds
+ */
+function parseISO8601Duration(duration: string): number {
+  if (!duration) return 180; // Default to 3 mins if missing
+  
+  const match = duration.match(/PT(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?/);
+  if (!match) return 180;
+  
+  const hours = (parseInt(match[1] || '0'));
+  const minutes = (parseInt(match[2] || '0'));
+  const seconds = (parseInt(match[3] || '0'));
+  
+  return hours * 3600 + minutes * 60 + seconds;
+}
+
+/**
+ * Helper to fetch detailed video info (specifically duration) for a list of IDs
+ */
+async function fetchVideoDetails(videoIds: string[]): Promise<Map<string, number>> {
+  if (videoIds.length === 0) return new Map();
+
+  const result = await makeAPIRequest(async (apiKey) => {
+    const response = await fetch(
+      `https://www.googleapis.com/youtube/v3/videos?` +
+      `key=${apiKey}&part=contentDetails&id=${videoIds.join(',')}`
+    );
+    return response.json();
+  });
+
+  const durationMap = new Map<string, number>();
+  
+  if (result?.items) {
+    result.items.forEach((item: any) => {
+      durationMap.set(item.id, parseISO8601Duration(item.contentDetails?.duration));
+    });
+  }
+
+  return durationMap;
+}
+
+/**
  * Fetch popular Ethiopian artists
  */
 export async function fetchEthiopianArtists(): Promise<Artist[]> {
@@ -110,6 +151,7 @@ export async function fetchPopularArtists(): Promise<Artist[]> {
  * Fetch popular tracks from an artist
  */
 export async function fetchArtistTracks(artistName: string, maxResults = 10): Promise<YouTubeTrack[]> {
+  // 1. Search for videos
   const result = await makeAPIRequest(async (apiKey) => {
     const response = await fetch(
       `https://www.googleapis.com/youtube/v3/search?` +
@@ -119,7 +161,11 @@ export async function fetchArtistTracks(artistName: string, maxResults = 10): Pr
     return response.json();
   });
 
-  if (!result?.items) return [];
+  if (!result?.items || result.items.length === 0) return [];
+
+  // 2. Fetch details (duration) for found videos
+  const videoIds = result.items.map((item: any) => item.id.videoId).filter(Boolean);
+  const durationMap = await fetchVideoDetails(videoIds);
 
   return result.items.map((item: any) => ({
     id: item.id.videoId,
@@ -127,7 +173,7 @@ export async function fetchArtistTracks(artistName: string, maxResults = 10): Pr
     artist: item.snippet.channelTitle,
     album: item.snippet.title,
     coverArt: item.snippet.thumbnails.high.url,
-    duration: 180, // Default duration
+    duration: durationMap.get(item.id.videoId) || 180,
     videoId: item.id.videoId,
     channelId: item.snippet.channelId,
   }));
@@ -148,23 +194,40 @@ export async function fetchEthiopianPodcasts(): Promise<Podcast[]> {
 
   for (const podcastName of ethiopianPodcasts) {
     const result = await makeAPIRequest(async (apiKey) => {
-      const response = await fetch(
+      // Fetch snippet AND statistics to get videoCount
+      const searchRes = await fetch(
         `https://www.googleapis.com/youtube/v3/search?` +
         `key=${apiKey}&part=snippet&q=${encodeURIComponent(podcastName)}&` +
         `type=channel&maxResults=1`
       );
-      return response.json();
+      const searchData = await searchRes.json();
+      
+      // If we found a channel, fetch its statistics
+      if (searchData?.items?.[0]) {
+        const channelId = searchData.items[0].id.channelId;
+        const channelRes = await fetch(
+          `https://www.googleapis.com/youtube/v3/channels?` +
+          `key=${apiKey}&part=statistics&id=${channelId}`
+        );
+        const channelData = await channelRes.json();
+        
+        // Merge data
+        const snippet = searchData.items[0].snippet;
+        const stats = channelData?.items?.[0]?.statistics;
+        
+        return { snippet, stats, id: channelId };
+      }
+      return null;
     });
 
-    if (result?.items?.[0]) {
-      const item = result.items[0];
+    if (result) {
       podcasts.push({
-        id: item.id.channelId,
-        title: item.snippet.title,
+        id: result.id,
+        title: result.snippet.title,
         creator: 'Ethiopian Content',
-        episodes: '100+ Episodes',
-        cover: item.snippet.thumbnails.high.url,
-        channelId: item.id.channelId,
+        episodes: result.stats ? `${result.stats.videoCount} Episodes` : '100+ Episodes',
+        cover: result.snippet.thumbnails.high.url,
+        channelId: result.id,
       });
     }
   }
@@ -187,23 +250,40 @@ export async function fetchPopularPodcasts(): Promise<Podcast[]> {
 
   for (const podcastName of popularPodcasts) {
     const result = await makeAPIRequest(async (apiKey) => {
-      const response = await fetch(
+       // Fetch snippet AND statistics to get videoCount
+       const searchRes = await fetch(
         `https://www.googleapis.com/youtube/v3/search?` +
         `key=${apiKey}&part=snippet&q=${encodeURIComponent(podcastName + ' podcast')}&` +
         `type=channel&maxResults=1`
       );
-      return response.json();
+      const searchData = await searchRes.json();
+      
+      // If we found a channel, fetch its statistics
+      if (searchData?.items?.[0]) {
+        const channelId = searchData.items[0].id.channelId;
+        const channelRes = await fetch(
+          `https://www.googleapis.com/youtube/v3/channels?` +
+          `key=${apiKey}&part=statistics&id=${channelId}`
+        );
+        const channelData = await channelRes.json();
+        
+        // Merge data
+        const snippet = searchData.items[0].snippet;
+        const stats = channelData?.items?.[0]?.statistics;
+        
+        return { snippet, stats, id: channelId };
+      }
+      return null;
     });
 
-    if (result?.items?.[0]) {
-      const item = result.items[0];
+    if (result) {
       podcasts.push({
-        id: item.id.channelId,
-        title: item.snippet.title,
+        id: result.id,
+        title: result.snippet.title,
         creator: 'Podcast Creator',
-        episodes: '500+ Episodes',
-        cover: item.snippet.thumbnails.high.url,
-        channelId: item.id.channelId,
+        episodes: result.stats ? `${result.stats.videoCount} Episodes` : '500+ Episodes',
+        cover: result.snippet.thumbnails.high.url,
+        channelId: result.id,
       });
     }
   }
@@ -216,9 +296,10 @@ export async function fetchPopularPodcasts(): Promise<Podcast[]> {
  */
 export async function fetchTrendingMusic(maxResults = 20): Promise<YouTubeTrack[]> {
   const result = await makeAPIRequest(async (apiKey) => {
+    // Added 'contentDetails' to part
     const response = await fetch(
       `https://www.googleapis.com/youtube/v3/videos?` +
-      `key=${apiKey}&part=snippet&chart=mostPopular&videoCategoryId=10&` +
+      `key=${apiKey}&part=snippet,contentDetails&chart=mostPopular&videoCategoryId=10&` +
       `regionCode=US&maxResults=${maxResults}`
     );
     return response.json();
@@ -232,7 +313,7 @@ export async function fetchTrendingMusic(maxResults = 20): Promise<YouTubeTrack[
     artist: item.snippet.channelTitle,
     album: item.snippet.title,
     coverArt: item.snippet.thumbnails.high.url,
-    duration: 180,
+    duration: parseISO8601Duration(item.contentDetails?.duration), // Parse real duration
     videoId: item.id,
     channelId: item.snippet.channelId,
   }));
@@ -251,7 +332,11 @@ export async function searchMusic(query: string, maxResults = 10): Promise<YouTu
     return response.json();
   });
 
-  if (!result?.items) return [];
+  if (!result?.items || result.items.length === 0) return [];
+
+  // Fetch real durations
+  const videoIds = result.items.map((item: any) => item.id.videoId).filter(Boolean);
+  const durationMap = await fetchVideoDetails(videoIds);
 
   return result.items.map((item: any) => ({
     id: item.id.videoId,
@@ -259,7 +344,7 @@ export async function searchMusic(query: string, maxResults = 10): Promise<YouTu
     artist: item.snippet.channelTitle,
     album: item.snippet.title,
     coverArt: item.snippet.thumbnails.high.url,
-    duration: 180,
+    duration: durationMap.get(item.id.videoId) || 180,
     videoId: item.id.videoId,
     channelId: item.snippet.channelId,
   }));
