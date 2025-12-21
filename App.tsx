@@ -601,7 +601,8 @@ const App: React.FC = () => {
       )}
 
       {/* Hidden React Player */}
-      <div className="hidden">
+      {/* Hidden React Player (Must be technically 'visible' for YouTube API to work) */}
+      <div className="fixed bottom-0 right-0 w-1 h-1 opacity-0 pointer-events-none overflow-hidden z-[-1]">
         <ReactPlayer
           ref={playerRef}
           url={currentTrack.videoId ? `https://www.youtube.com/watch?v=${currentTrack.videoId}` : undefined}
@@ -610,11 +611,17 @@ const App: React.FC = () => {
           playbackRate={playbackSpeed}
           onProgress={({ played }) => setProgress(played)}
           onEnded={handleNext}
-          width="0"
-          height="0"
+          width="100%"
+          height="100%"
           config={{
             youtube: {
-              playerVars: { showinfo: 0, controls: 0, autoplay: 1 }
+              playerVars: { 
+                showinfo: 0, 
+                controls: 0, 
+                autoplay: 1,
+                playsinline: 1,
+                origin: window.location.origin 
+              }
             }
           }}
         />
