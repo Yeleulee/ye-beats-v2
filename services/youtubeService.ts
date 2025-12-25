@@ -45,6 +45,19 @@ function parseISO8601Duration(duration: string): number {
 }
 
 /**
+ * Helper to throw formatted error for API Key Manager
+ */
+async function handleResponse(response: Response) {
+  if (!response.ok) {
+    const errorData = await response.json().catch(() => ({}));
+    const error = new Error(`YouTube API Error: ${response.status}`);
+    (error as any).response = { status: response.status, data: errorData };
+    throw error;
+  }
+  return response.json();
+}
+
+/**
  * Helper to fetch detailed video info (specifically duration) for a list of IDs
  */
 async function fetchVideoDetails(videoIds: string[]): Promise<Map<string, number>> {
@@ -55,7 +68,7 @@ async function fetchVideoDetails(videoIds: string[]): Promise<Map<string, number
       `https://www.googleapis.com/youtube/v3/videos?` +
       `key=${apiKey}&part=contentDetails&id=${videoIds.join(',')}`
     );
-    return response.json();
+    return handleResponse(response);
   });
 
   const durationMap = new Map<string, number>();
@@ -91,7 +104,7 @@ export async function fetchEthiopianArtists(): Promise<Artist[]> {
         `key=${apiKey}&part=snippet&q=${encodeURIComponent(artistName + ' official')}&` +
         `type=channel&maxResults=1`
       );
-      return response.json();
+      return handleResponse(response);
     });
 
     if (result?.items?.[0]) {
@@ -130,7 +143,7 @@ export async function fetchPopularArtists(): Promise<Artist[]> {
         `key=${apiKey}&part=snippet&q=${encodeURIComponent(artistName + ' official')}&` +
         `type=channel&maxResults=1`
       );
-      return response.json();
+      return handleResponse(response);
     });
 
     if (result?.items?.[0]) {
@@ -158,7 +171,7 @@ export async function fetchArtistTracks(artistName: string, maxResults = 10): Pr
       `key=${apiKey}&part=snippet&q=${encodeURIComponent(artistName + ' official audio')}&` +
       `type=video&maxResults=${maxResults}&videoCategoryId=10`
     );
-    return response.json();
+    return handleResponse(response);
   });
 
   if (!result?.items || result.items.length === 0) return [];
@@ -200,7 +213,7 @@ export async function fetchEthiopianPodcasts(): Promise<Podcast[]> {
         `key=${apiKey}&part=snippet&q=${encodeURIComponent(podcastName)}&` +
         `type=channel&maxResults=1`
       );
-      const searchData = await searchRes.json();
+      const searchData = await handleResponse(searchRes);
       
       // If we found a channel, fetch its statistics
       if (searchData?.items?.[0]) {
@@ -209,7 +222,7 @@ export async function fetchEthiopianPodcasts(): Promise<Podcast[]> {
           `https://www.googleapis.com/youtube/v3/channels?` +
           `key=${apiKey}&part=statistics&id=${channelId}`
         );
-        const channelData = await channelRes.json();
+        const channelData = await handleResponse(channelRes);
         
         // Merge data
         const snippet = searchData.items[0].snippet;
@@ -256,7 +269,7 @@ export async function fetchPopularPodcasts(): Promise<Podcast[]> {
         `key=${apiKey}&part=snippet&q=${encodeURIComponent(podcastName + ' podcast')}&` +
         `type=channel&maxResults=1`
       );
-      const searchData = await searchRes.json();
+      const searchData = await handleResponse(searchRes);
       
       // If we found a channel, fetch its statistics
       if (searchData?.items?.[0]) {
@@ -265,7 +278,7 @@ export async function fetchPopularPodcasts(): Promise<Podcast[]> {
           `https://www.googleapis.com/youtube/v3/channels?` +
           `key=${apiKey}&part=statistics&id=${channelId}`
         );
-        const channelData = await channelRes.json();
+        const channelData = await handleResponse(channelRes);
         
         // Merge data
         const snippet = searchData.items[0].snippet;
@@ -302,7 +315,7 @@ export async function fetchTrendingMusic(maxResults = 20): Promise<YouTubeTrack[
       `key=${apiKey}&part=snippet,contentDetails&chart=mostPopular&videoCategoryId=10&` +
       `regionCode=US&maxResults=${maxResults}`
     );
-    return response.json();
+    return handleResponse(response);
   });
 
   if (!result?.items) return [];
@@ -329,7 +342,7 @@ export async function searchMusic(query: string, maxResults = 10): Promise<YouTu
       `key=${apiKey}&part=snippet&q=${encodeURIComponent(query)}&` +
       `type=video&videoCategoryId=10&maxResults=${maxResults}`
     );
-    return response.json();
+    return handleResponse(response);
   });
 
   if (!result?.items || result.items.length === 0) return [];

@@ -32,25 +32,63 @@ class APIKeyManager {
    * Supports multiple keys: YOUTUBE_API_KEY, YOUTUBE_API_KEY_2, YOUTUBE_API_KEY_3, etc.
    */
   private initializeKeys(): void {
-    const envKeys = [
-      import.meta.env.VITE_YOUTUBE_API_KEY,
-      import.meta.env.VITE_YOUTUBE_API_KEY_2,
-      import.meta.env.VITE_YOUTUBE_API_KEY_3,
-      import.meta.env.VITE_YOUTUBE_API_KEY_4,
-      import.meta.env.VITE_YOUTUBE_API_KEY_5,
-      import.meta.env.VITE_YOUTUBE_API_KEY_6,
-      import.meta.env.VITE_YOUTUBE_API_KEY_7,
-      import.meta.env.VITE_YOUTUBE_API_KEY_8,
-      import.meta.env.VITE_YOUTUBE_API_KEY_9,
-      import.meta.env.VITE_YOUTUBE_API_KEY_10,
-    ].filter(Boolean) as string[];
+    console.log('🔄 Initializing API Keys...');
+    console.log('Available Env Vars:', Object.keys(import.meta.env).filter(key => key.startsWith('VITE_')));
 
-    if (envKeys.length === 0) {
-      console.warn('⚠️ No API keys found. Please add at least one key to .env.local');
+    const keyVars = [
+      'VITE_YOUTUBE_API_KEY',
+      'VITE_YOUTUBE_API_KEY_2',
+      'VITE_YOUTUBE_API_KEY_3',
+      'VITE_YOUTUBE_API_KEY_4',
+      'VITE_YOUTUBE_API_KEY_5',
+      'VITE_YOUTUBE_API_KEY_6',
+      'VITE_YOUTUBE_API_KEY_7',
+      'VITE_YOUTUBE_API_KEY_8',
+      'VITE_YOUTUBE_API_KEY_9',
+      'VITE_YOUTUBE_API_KEY_10',
+    ];
+
+    let allKeys: string[] = [];
+    const primaryKey = import.meta.env.VITE_YOUTUBE_API_KEY || import.meta.env.VITE_YOUTUBE_API_KEYS;
+
+    if (primaryKey) {
+        console.log(`ℹ️ Raw VITE_YOUTUBE_API_KEY length: ${primaryKey.length}`);
+        
+        // Split by comma, space, or newline
+        if (primaryKey.match(/[\s,]/)) {
+            console.log('✅ Detected multiple keys (separator-based) in primary variable');
+            // Remove quotes if present and split
+            const cleanKey = primaryKey.replace(/['"]/g, ''); 
+            allKeys = cleanKey.split(/[\s,]+/).map((k: string) => k.trim()).filter((k: string) => k.length > 0);
+        } else {
+            console.log('ℹ️ Single key detected in primary variable, checking others...');
+            allKeys.push(primaryKey);
+            
+            // Should verify other numbered keys if the first one wasn't a combined string
+            const otherKeys = keyVars.slice(1)
+              .map(varName => import.meta.env[varName])
+              .filter(Boolean) as string[];
+            allKeys = [...allKeys, ...otherKeys];
+        }
+    } else {
+        console.warn('❌ Primary VITE_YOUTUBE_API_KEY is missing or empty');
+        console.warn('Current VITE_YOUTUBE_API_KEY value:', primaryKey);
+        
+        // Try fallback to numbered keys only (rare case)
+         allKeys = keyVars
+            .map(varName => import.meta.env[varName])
+            .filter(Boolean) as string[];
+    }
+
+    // Filter out obviously short/invalid keys (AIza keys are usually ~39 chars)
+    allKeys = allKeys.filter(k => k.length > 20);
+
+    if (allKeys.length === 0) {
+      console.error('❌ FATAL: No valid API keys found. App cannot fetch data.');
       return;
     }
 
-    this.keys = envKeys.map((key) => ({
+    this.keys = allKeys.map((key) => ({
       key,
       requestCount: 0,
       dailyLimit: this.DAILY_QUOTA,
@@ -58,7 +96,8 @@ class APIKeyManager {
       isBlocked: false,
     }));
 
-    console.log(`✅ Initialized ${this.keys.length} API key(s) for rotation`);
+    console.log(`✅ Initialized ${this.keys.length} valid API key(s) for rotation`);
+    console.log(`🔑 Keys loaded: ${this.keys.map((k, i) => `#${i+1}: ...${k.key.slice(-4)}`).join(', ')}`);
   }
 
   /**

@@ -35,3 +35,11 @@ export interface FriendActivity {
   status: 'listening' | 'idle' | 'offline';
   currentTrack?: Track;
 }
+
+export interface Podcast {
+  title: string;
+  creator: string;
+  episodes: string;
+  cover: string;
+  color: string;
+}
