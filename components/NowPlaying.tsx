@@ -10,7 +10,7 @@ import { cn } from '../lib/utils';
 interface NowPlayingProps {
   track: Track;
   audioMode: AudioMode;
-  onToggleMode: (mode: AudioMode) => void; 
+  onToggleMode: (mode: AudioMode) => void;
   onClose: () => void;
   isPlaying: boolean;
   onPlayPause: () => void;
@@ -83,7 +83,7 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
   onJumpToTrack,
 }) => {
   const progressRef = useRef<HTMLDivElement>(null);
-  const volumeRef = useRef<HTMLDivElement>(null);
+  const volumeRef = useRef<HTMLDivElement>('null');
 
   const handleScrub = useCallback((e: React.MouseEvent) => {
     if (!progressRef.current) return;
