@@ -1,5 +1,5 @@
 
-import React, { useState, useRef, useCallback, useEffect } from 'react';
+import React, { useState, useRef, useCallback, useEffect, memo } from 'react';
 import {
   ChevronDown, MoreHorizontal, Share2, Music2, Video, Play, Pause, SkipBack, SkipForward, Repeat,
   Shuffle, Repeat1, Volume2, Volume1, VolumeX, ListMusic, X, Zap, Gauge, Radio, Airplay
@@ -32,7 +32,12 @@ interface NowPlayingProps {
   setPlaybackSpeed: (speed: number) => void;
 }
 
-const QueueItem: React.FC<{track: Track, onPlay: () => void, onRemove: () => void, isPlaying: boolean}> = ({ track, onPlay, onRemove, isPlaying }) => {
+const QueueItem = memo<{
+    track: Track, 
+    onPlay: () => void, 
+    onRemove: () => void, 
+    isPlaying: boolean
+}>(({ track, onPlay, onRemove, isPlaying }) => {
     return (
         <div
             className={cn(
@@ -54,8 +59,7 @@ const QueueItem: React.FC<{track: Track, onPlay: () => void, onRemove: () => voi
             </button>
         </div>
     );
-}
-
+});
 
 const NowPlaying: React.FC<NowPlayingProps> = ({
   track,
@@ -77,8 +81,6 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
   queue,
   removeFromQueue,
   onJumpToTrack,
-  playbackSpeed,
-  setPlaybackSpeed,
 }) => {
   const progressRef = useRef<HTMLDivElement>(null);
   const volumeRef = useRef<HTMLDivElement>(null);
@@ -99,17 +101,17 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
     setVolume(newVolume);
   }, [setVolume]);
 
-  const formatTime = (p: number) => {
+  const formatTime = useCallback((p: number) => {
     const totalSeconds = track.duration;
     const currentSeconds = Math.floor(p * totalSeconds);
     const mins = Math.floor(currentSeconds / 60);
     const secs = currentSeconds % 60;
     return `${mins}:${secs.toString().padStart(2, '0')}`;
-  };
+  }, [track.duration]);
 
-  const cycleRepeat = () => {
+  const cycleRepeat = useCallback(() => {
     setRepeatMode(((repeatMode + 1) % 3) as 0 | 1 | 2);
-  };
+  }, [repeatMode, setRepeatMode]);
   
   const renderVolumeIcon = () => {
     if (volume === 0) return <VolumeX size={20} />;
@@ -224,7 +226,7 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
                             track={t}
                             onPlay={() => onJumpToTrack(t)}
                             onRemove={() => removeFromQueue(t.id)}
-                            isPlaying={false}
+                            isPlaying={false} /* This would need to be dynamic based on if it's the currently playing track in a playlist context */
                         />
                     ))}
                     {queue.length === 0 && (
@@ -239,4 +241,4 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
   );
 };
 
-export default NowPlaying;
+export default memo(NowPlaying);
