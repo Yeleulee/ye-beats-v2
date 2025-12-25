@@ -1,6 +1,6 @@
 
 import React, { memo, useRef, useEffect } from 'react';
-import { Track } from '../types';
+import { Track } from '../../types';
 import QueueItem from './QueueItem';
 
 interface UpNextProps {

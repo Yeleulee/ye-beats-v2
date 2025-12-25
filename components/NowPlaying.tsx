@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useCallback, useEffect, memo } from 'react';
-import ReactPlayer from 'react-player/youtube';
+import ReactPlayer from 'react-player';
 import {
   ChevronDown, MoreHorizontal, Share2, Music2, Video, Play, Pause, SkipBack, SkipForward, Repeat,
   Shuffle, Repeat1, Volume2, Volume1, VolumeX, ListMusic, X, Zap, Gauge, Radio, Airplay
@@ -8,6 +8,9 @@ import {
 import { Track, AudioMode } from '../types';
 import { cn } from '../lib/utils';
 import UpNext from './now-playing/UpNext';
+// We'll import searchLyrics dynamically to avoid circular deps if any, or just import normally.
+// But wait, searchLyrics is a named export.
+import { searchLyrics } from '../utils/lyricsService';
 
 interface NowPlayingProps {
   track: Track;
@@ -54,6 +57,40 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
 }) => {
   const volumeRef = useRef<HTMLDivElement>(null);
   const videoPlayerRef = useRef<ReactPlayer>(null);
+  const [lyrics, setLyrics] = useState<string | null>(null);
+  const [isLoadingLyrics, setIsLoadingLyrics] = useState(false);
+  const [rightPanelView, setRightPanelView] = useState<'QUEUE' | 'LYRICS'>('QUEUE');
+
+  // Fetch lyrics when track changes
+  useEffect(() => {
+    const fetchLyrics = async () => {
+      // Only fetch if we are in lyrics view to save bandwidth, 
+      // or fetch eagerly? Let's fetch when tab is active OR just fetch eagerly for better UX?
+      // fetching eagerly is better for "connect this to song".
+      
+      setIsLoadingLyrics(true);
+      setLyrics(null);
+      // Determine artist and title safely
+      const artist = track.artist;
+      const title = track.title;
+      
+      try {
+        const result = await searchLyrics(title, artist, track.album, track.duration);
+        if (result) {
+          setLyrics(result.plainLyrics || result.syncedLyrics || 'No text lyrics available.');
+        } else {
+          setLyrics('Lyrics not found.');
+        }
+      } catch (error) {
+        console.error("Failed to fetch lyrics", error);
+        setLyrics('Could not load lyrics.');
+      } finally {
+        setIsLoadingLyrics(false);
+      }
+    };
+
+    fetchLyrics();
+  }, [track.id, track.artist, track.title, track.album, track.duration]);
 
   // Sync video player progress with main audio progress
   useEffect(() => {
@@ -202,7 +239,60 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
                  <button onClick={() => {}} className="p-2 text-zinc-400 hover:text-white"><Airplay size={20} /></button>
             </div>
             
-            <UpNext queue={queue} currentTrackId={track.id} onJumpToTrack={onJumpToTrack} />
+            {/* View Switcher: Queue vs Lyrics */}
+            <div className="flex items-center justify-start gap-8 mt-8 border-b border-white/10">
+                <button 
+                  onClick={() => setRightPanelView('QUEUE')}
+                  className={cn(
+                    "text-xs font-bold uppercase tracking-[0.2em] py-4 transition-all relative",
+                    rightPanelView === 'QUEUE' ? "text-white" : "text-zinc-500 hover:text-white"
+                  )}
+                >
+                  Up Next
+                  {rightPanelView === 'QUEUE' && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-600 shadow-[0_-2px_8px_rgba(220,38,38,0.5)]" />
+                  )}
+                </button>
+                <button 
+                  onClick={() => setRightPanelView('LYRICS')}
+                  className={cn(
+                    "text-xs font-bold uppercase tracking-[0.2em] py-4 transition-all relative",
+                    rightPanelView === 'LYRICS' ? "text-white" : "text-zinc-500 hover:text-white"
+                  )}
+                >
+                  Lyrics
+                  {rightPanelView === 'LYRICS' && (
+                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-600 shadow-[0_-2px_8px_rgba(220,38,38,0.5)]" />
+                  )}
+                </button>
+            </div>
+
+            <div className="flex-1 overflow-hidden min-h-0 relative mt-4">
+              {rightPanelView === 'QUEUE' ? (
+                <div className="h-full overflow-y-auto pr-2 custom-scrollbar">
+                   <UpNext queue={queue} currentTrackId={track.id} onJumpToTrack={onJumpToTrack} />
+                </div>
+              ) : (
+                <div className="h-full overflow-y-auto pr-2 custom-scrollbar">
+                   {isLoadingLyrics ? (
+                     <div className="flex items-center justify-center h-40">
+                       <div className="w-6 h-6 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                     </div>
+                   ) : (
+                     <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                       <p className="text-zinc-300 whitespace-pre-line leading-loose text-lg lg:text-xl font-medium pb-10 text-center lg:text-left">
+                         {lyrics || "No lyrics found for this song."}
+                       </p>
+                       <div className="text-center mt-4 mb-8">
+                         <span className="text-[10px] uppercase tracking-widest text-zinc-600">
+                           Lyrics provided by LRCLIB
+                         </span>
+                       </div>
+                     </div>
+                   )}
+                </div>
+              )}
+            </div>
 
         </div>
       </div>

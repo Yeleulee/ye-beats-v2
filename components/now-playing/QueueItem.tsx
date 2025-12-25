@@ -1,7 +1,7 @@
 
 import React, { memo } from 'react';
-import { cn } from '../lib/utils';
-import { Track } from '../types';
+import { cn } from '../../lib/utils';
+import { Track } from '../../types';
 
 interface QueueItemProps {
     track: Track;
