@@ -71,11 +71,33 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
 
       {/* Navigation Header */}
       <nav className="fixed top-0 left-0 w-full z-50 px-6 py-6 lg:px-12 flex items-center justify-between bg-gradient-to-b from-black/80 to-transparent backdrop-blur-[4px]">
-        <div className="flex items-center gap-4 group cursor-pointer">
-          <div className="w-10 h-10 bg-red-600 rounded-xl flex items-center justify-center shadow-[0_0_30px_rgba(255,0,0,0.4)] transition-transform group-hover:rotate-12">
-            <div className="w-2.5 h-2.5 bg-white rounded-full animate-pulse" />
+        <div className="flex items-center gap-4 group cursor-pointer" onClick={() => window.location.reload()}>
+          <div className="relative w-12 h-12 flex-shrink-0">
+            {/* Spinning Record on Hover */}
+            <div className="w-full h-full rounded-full bg-zinc-900 border border-white/10 shadow-[0_0_30px_rgba(220,38,38,0.3)] flex items-center justify-center relative z-10 transition-transform duration-700 ease-out group-hover:rotate-[360deg]">
+               {/* Vinyl Grooves Gradient */}
+               <div className="absolute inset-0 rounded-full bg-[conic-gradient(transparent_0deg,rgba(255,255,255,0.1)_90deg,transparent_180deg,rgba(255,255,255,0.1)_270deg,transparent_360deg)] opacity-50" />
+               <div className="absolute inset-1 rounded-full border border-white/5" />
+               <div className="absolute inset-2 rounded-full border border-white/5" />
+               <div className="absolute inset-3 rounded-full border border-white/5" />
+               
+               {/* Center Label */}
+               <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center relative overflow-hidden shadow-inner group-hover:scale-110 transition-transform">
+                 <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/30" />
+                 <div className="w-1.5 h-1.5 bg-black rounded-full border border-white/20" />
+               </div>
+            </div>
+
+            {/* Tone Arm (Decorative) */}
+            <div className="absolute -top-1 -right-1 w-6 h-10 pointer-events-none z-20 origin-top-right transition-transform duration-500 ease-in-out group-hover:rotate-[20deg]">
+              <svg viewBox="0 0 24 40" className="w-full h-full drop-shadow-md">
+                 <path d="M20,2 C20,1 21,0 22,0 C23,0 24,1 24,2 L24,6 C24,7 23,8 22,8 C21,8 20,7 20,6 L20,2 Z" fill="#52525b" />
+                 <path d="M22,4 L12,25 C11,27 8,28 6,28 L2,30" stroke="#71717a" strokeWidth="2" fill="none" strokeLinecap="round" />
+                 <rect x="0" y="28" width="6" height="8" rx="1" transform="rotate(-15 3 32)" fill="#3f3f46" />
+              </svg>
+            </div>
           </div>
-          <span className="text-2xl font-black tracking-tighter brand-cursive">Ye Beats</span>
+          <span className="text-2xl font-black tracking-tighter brand-cursive text-white">Ye Beats</span>
         </div>
         <div className="hidden md:flex items-center gap-10">
           <a href="#features" className="text-[11px] font-black uppercase tracking-[0.4em] text-zinc-500 hover:text-white transition-colors font-['Roboto_Flex']">Experience</a>
@@ -268,9 +290,28 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
       <footer className="py-16 md:py-24 lg:py-32 px-6 lg:px-12 z-10 relative border-t border-white/5 bg-zinc-950/50 backdrop-blur-xl">
         <div className="max-w-7xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-10 md:gap-16 lg:gap-20 mb-16 md:mb-24 lg:mb-32">
           <div className="col-span-2 space-y-6 md:space-y-8">
-             <div className="flex items-center gap-3 md:gap-4">
-              <div className="w-8 h-8 md:w-10 md:h-10 bg-red-600 rounded-lg md:rounded-xl flex items-center justify-center">
-                <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-white rounded-full" />
+             <div className="flex items-center gap-3 md:gap-4 group cursor-pointer">
+              <div className="relative w-10 h-10 md:w-12 md:h-12 flex-shrink-0">
+                {/* Spinning Record on Hover */}
+                <div className="w-full h-full rounded-full bg-zinc-900 border border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.8)] flex items-center justify-center relative z-10 transition-transform duration-700 ease-out group-hover:rotate-[360deg]">
+                  <div className="absolute inset-0 rounded-full bg-[conic-gradient(transparent_0deg,rgba(255,255,255,0.1)_90deg,transparent_180deg,rgba(255,255,255,0.1)_270deg,transparent_360deg)] opacity-50" />
+                  <div className="absolute inset-1 rounded-full border border-white/5" />
+                  
+                  {/* Center Label */}
+                  <div className="w-4 h-4 md:w-5 md:h-5 bg-red-600 rounded-full flex items-center justify-center relative overflow-hidden shadow-inner group-hover:scale-110 transition-transform">
+                    <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/30" />
+                    <div className="w-1 h-1 md:w-1.5 md:h-1.5 bg-black rounded-full border border-white/20" />
+                  </div>
+                </div>
+
+                {/* Tone Arm */}
+                <div className="absolute -top-1 -right-1 w-5 h-8 md:w-6 md:h-10 pointer-events-none z-20 origin-top-right transition-transform duration-500 ease-in-out group-hover:rotate-[20deg]">
+                  <svg viewBox="0 0 24 40" className="w-full h-full drop-shadow-md">
+                    <path d="M20,2 C20,1 21,0 22,0 C23,0 24,1 24,2 L24,6 C24,7 23,8 22,8 C21,8 20,7 20,6 L20,2 Z" fill="#52525b" />
+                    <path d="M22,4 L12,25 C11,27 8,28 6,28 L2,30" stroke="#71717a" strokeWidth="2" fill="none" strokeLinecap="round" />
+                    <rect x="0" y="28" width="6" height="8" rx="1" transform="rotate(-15 3 32)" fill="#3f3f46" />
+                  </svg>
+                </div>
               </div>
               <span className="text-2xl md:text-3xl font-black tracking-tighter text-white brand-cursive">Ye Beats</span>
             </div>

@@ -180,15 +180,15 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
           </div>
 
           <div className="w-full flex items-center justify-between mb-10 px-2">
-            <div className="flex flex-col items-start min-w-0 pr-8">
+            <div className="flex flex-col items-start min-w-0 pr-8 w-full">
               <div className="flex items-center w-full min-w-0">
-                <h2 className="text-5xl md:text-8xl font-black tracking-tighter mb-2 leading-none truncate flex-1 text-white font-['Inter'] uppercase">{track.title}</h2>
+                <h2 className="text-3xl md:text-5xl lg:text-6xl font-black tracking-tighter mb-2 leading-[0.9] text-white font-['Inter'] uppercase line-clamp-2 text-left">{track.title}</h2>
                 {renderQualityIcon()}
               </div>
-              <p className="text-2xl md:text-3xl text-zinc-500 font-bold tracking-tight font-['Roboto_Flex'] brand-cursive">{track.artist}</p>
+              <p className="text-xl md:text-2xl text-zinc-500 font-bold tracking-tight font-['Roboto_Flex'] brand-cursive">{track.artist}</p>
             </div>
-            <button className="p-5 bg-white/5 rounded-[28px] text-zinc-400 hover:text-white transition-all shadow-xl">
-              <Share2 size={28} />
+            <button className="p-4 bg-white/5 rounded-[24px] text-zinc-400 hover:text-white transition-all shadow-xl flex-shrink-0">
+              <Share2 size={24} />
             </button>
           </div>
 
@@ -209,7 +209,7 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
                   style={{ width: `${progress * 100}%` }}
                 >
                   {/* Draggable thumb */}
-                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-5 h-5 bg-white rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_0_2px_rgba(255,0,0,0.3)] transition-transform group-hover:scale-125 border-2 border-red-500">
+                  <div className="absolute right-0 top-1/2 -translate-y-1/2 w-4 h-4 md:w-5 md:h-5 bg-white rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.4),0_0_0_2px_rgba(255,0,0,0.3)] transition-transform group-hover:scale-125 border-2 border-red-500">
                     <div className="absolute inset-0 bg-gradient-to-br from-white to-zinc-100 rounded-full" />
                   </div>
                 </div>
@@ -222,17 +222,17 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
             </div>
           </div>
 
-          <div className="w-full flex items-center justify-between max-w-lg mx-auto mb-6">
+          <div className="w-full flex items-center justify-between max-w-lg mx-auto mb-6 gap-4">
             <button onClick={() => setIsShuffle(!isShuffle)} className={`p-3 ${isShuffle ? 'text-red-600' : 'text-zinc-600 hover:text-white'}`}>
-              <Shuffle size={28} />
+              <Shuffle size={24} />
             </button>
-            <button onClick={onPrevious} className="text-white hover:text-zinc-400 p-3 active:scale-75"><SkipBack size={48} fill="currentColor" /></button>
-            <button onClick={onPlayPause} className="w-28 h-28 bg-white rounded-full flex items-center justify-center hover:scale-105 active:scale-90 transition-all shadow-xl">
-              {isPlaying ? <Pause className="text-black" fill="black" size={52} /> : <Play className="text-black ml-2" fill="black" size={52} />}
+            <button onClick={onPrevious} className="text-white hover:text-zinc-400 p-3 active:scale-75"><SkipBack size={32} fill="currentColor" /></button>
+            <button onClick={onPlayPause} className="w-20 h-20 md:w-24 md:h-24 bg-white rounded-full flex items-center justify-center hover:scale-105 active:scale-90 transition-all shadow-xl">
+              {isPlaying ? <Pause className="text-black" fill="black" size={32} /> : <Play className="text-black ml-1" fill="black" size={32} />}
             </button>
-            <button onClick={onNext} className="text-white hover:text-zinc-400 p-3 active:scale-75"><SkipForward size={48} fill="currentColor" /></button>
+            <button onClick={onNext} className="text-white hover:text-zinc-400 p-3 active:scale-75"><SkipForward size={32} fill="currentColor" /></button>
             <button onClick={cycleRepeat} className={`p-3 ${repeatMode > 0 ? 'text-red-600' : 'text-zinc-600 hover:text-white'}`}>
-              {repeatMode === 2 ? <Repeat1 size={28} /> : <Repeat size={28} />}
+              {repeatMode === 2 ? <Repeat1 size={24} /> : <Repeat size={24} />}
             </button>
           </div>
 

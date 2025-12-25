@@ -109,80 +109,22 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
           color: 'from-purple-600/80 to-pink-600/80' // Default color
         }));
 
-        // Update state with real data (fallback to mock only if no data)
-        setTrendingTracks(convertedTrending.length > 0 ? convertedTrending : MOCK_TRACKS);
-        setTimeBasedTracks(convertedTimeBased.length > 0 ? convertedTimeBased : MOCK_TRACKS);
-        setRecentlyPlayedTracks(convertedRecent.length > 0 ? convertedRecent : MOCK_TRACKS);
-        setPodcastData(allPodcasts.length > 4 ? allPodcasts.slice(0, 4) : [
-          {
-            title: 'The Weeknd Experience',
-            creator: 'Music Tales',
-            episodes: '24 Episodes',
-            cover: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=80&w=400&h=400&auto=format&fit=crop',
-            color: 'from-purple-600/80 to-pink-600/80'
-          },
-          {
-            title: 'Behind the Beat',
-            creator: 'Producer Stories',
-            episodes: '18 Episodes',
-            cover: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?q=80&w=400&h=400&auto=format&fit=crop',
-            color: 'from-blue-600/80 to-cyan-600/80'
-          },
-          {
-            title: 'City Pop Chronicles', 
-            creator: 'Tokyo Nights',
-            episodes: '32 Episodes',
-            cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=400&h=400&auto=format&fit=crop',
-            color: 'from-orange-600/80 to-red-600/80'
-          },
-          {
-            title: 'R&B Evolution',
-            creator: 'Soul Stories',
-            episodes: '41 Episodes',
-            cover: 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?q=80&w=400&h=400&auto=format&fit=crop',
-            color: 'from-emerald-600/80 to-teal-600/80'
-          }
-        ]);
+        // Update state with real data
+        setTrendingTracks(convertedTrending.length > 0 ? convertedTrending : []);
+        setTimeBasedTracks(convertedTimeBased.length > 0 ? convertedTimeBased : []);
+        setRecentlyPlayedTracks(convertedRecent.length > 0 ? convertedRecent : []);
+        setPodcastData(allPodcasts.length > 0 ? allPodcasts : []);
 
         setDataLoaded(true);
         console.log('✅ Data loaded successfully!');
         console.log('📊 Final API Stats:', apiKeyManager.getStats());
       } catch (error) {
         console.error('❌ Error fetching data:', error);
-        // Fallback to mock data
-        setTrendingTracks(MOCK_TRACKS);
-        setTimeBasedTracks(MOCK_TRACKS);
-        setRecentlyPlayedTracks(MOCK_TRACKS);
-        setPodcastData([
-          {
-            title: 'The Weeknd Experience',
-            creator: 'Music Tales',
-            episodes: '24 Episodes',
-            cover: 'https://images.unsplash.com/photo-1478737270239-2f02b77fc618?q=80&w=400&h=400&auto=format&fit=crop',
-            color: 'from-purple-600/80 to-pink-600/80'
-          },
-          {
-            title: 'Behind the Beat',
-            creator: 'Producer Stories',
-            episodes: '18 Episodes',
-            cover: 'https://images.unsplash.com/photo-1590602847861-f357a9332bbc?q=80&w=400&h=400&auto=format&fit=crop',
-            color: 'from-blue-600/80 to-cyan-600/80'
-          },
-          {
-            title: 'City Pop Chronicles', 
-            creator: 'Tokyo Nights',
-            episodes: '32 Episodes',
-            cover: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?q=80&w=400&h=400&auto=format&fit=crop',
-            color: 'from-orange-600/80 to-red-600/80'
-          },
-          {
-            title: 'R&B Evolution',
-            creator: 'Soul Stories',
-            episodes: '41 Episodes',
-            cover: 'https://images.unsplash.com/photo-1487180144351-b8472da7d491?q=80&w=400&h=400&auto=format&fit=crop',
-            color: 'from-emerald-600/80 to-teal-600/80'
-          }
-        ]);
+        // Fallback to empty states or minimal error handling, NO MORE MOCK DATA
+        setTrendingTracks([]);
+        setTimeBasedTracks([]);
+        setRecentlyPlayedTracks([]);
+        setPodcastData([]);
       } finally {
         setIsLoading(false);
       }
@@ -211,7 +153,7 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
 
   // Calculate personalized listening stats
   const getListeningStats = () => {
-    const tracksToUse = trendingTracks.length > 0 ? trendingTracks : MOCK_TRACKS;
+    const tracksToUse = trendingTracks;
     const totalTracks = tracksToUse.length;
     const totalMinutes = tracksToUse.reduce((sum, track) => sum + Math.floor(track.duration / 60), 0);
     const topArtist = tracksToUse[0]?.artist || 'The Weeknd'; // Most frequently appearing artist
@@ -231,7 +173,7 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
   // Get time-based recommendations
   const getTimeBasedRecommendations = () => {
     const hour = currentTime.getHours();
-    const tracksToUse = timeBasedTracks.length > 0 ? timeBasedTracks.slice(0, 6) : MOCK_TRACKS.slice(0, 6);
+    const tracksToUse = timeBasedTracks.slice(0, 6);
     
     if (hour < 12) {
       // Morning: Energizing tracks, workout playlists
@@ -426,7 +368,7 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
                     />
                     
                     {/* Gradient Overlay */}
-                    <div className={`absolute inset-0 bg-gradient-to-t ${recommendations.color} via-black/40 to-black/20 opacity-90 group-hover:opacity-80 transition-opacity`} />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent opacity-80 group-hover:opacity-70 transition-opacity" />
                     
                     {/* Content Overlay */}
                     <div className="absolute inset-0 p-5 flex flex-col justify-between z-10">
@@ -525,7 +467,7 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
           <div className="flex overflow-x-auto gap-3 md:gap-4 px-6 md:px-8 lg:px-10 no-scrollbar pb-4 md:pb-6 snap-x snap-mandatory scroll-smooth touch-pan-x">
             {/* Personalized Replay 2025 Card */}
             <div 
-              onClick={() => onTrackSelect(trendingTracks[0] || MOCK_TRACKS[0])}
+              onClick={() => trendingTracks[0] && onTrackSelect(trendingTracks[0])}
               className="snap-center flex-shrink-0 w-[75vw] sm:w-[340px] md:w-[380px] lg:w-[420px] rounded-[32px] md:rounded-[40px] overflow-hidden relative shadow-[0_20px_45px_-10px_rgba(0,0,0,0.9)] border border-white/10 active:scale-[0.98] transition-all group cursor-pointer hover:border-white/20"
             >
               <div className="absolute inset-0 bg-gradient-to-br from-red-600 via-purple-600 to-blue-600 opacity-60 group-hover:opacity-70 transition-opacity" />
@@ -605,7 +547,7 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
                   />
                   
                   {/* Gradient overlay */}
-                  <div className={`absolute inset-0 bg-gradient-to-t ${podcast.color} via-black/60 to-black/40`} />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent opacity-90" />
                   
                   {/* Content overlay */}
                   <div className="absolute inset-0 p-6 flex flex-col justify-between">
@@ -635,7 +577,10 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
                       <div className="flex items-center justify-between">
                         <div className="flex-1" />
                         <button 
-                          onClick={() => onTrackSelect(timeBasedTracks[i] || trendingTracks[0])}
+                          onClick={() => {
+                            const trackToPlay = timeBasedTracks[i] || trendingTracks[0];
+                            if (trackToPlay) onTrackSelect(trackToPlay);
+                          }}
                           className="w-14 h-14 bg-white rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-[0_8px_24px_rgba(0,0,0,0.4)] border-2 border-white/20"
                         >
                           <Play size={22} fill="black" className="text-black ml-0.5" />
@@ -662,7 +607,7 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
             </div>
           ) : (
             <div className="flex overflow-x-auto gap-4 md:gap-6 px-6 md:px-8 lg:px-10 no-scrollbar snap-x scroll-smooth touch-pan-x">
-              {(recentlyPlayedTracks.length > 0 ? recentlyPlayedTracks : MOCK_TRACKS).map((track) => (
+              {recentlyPlayedTracks.map((track) => (
                 <div 
                   key={track.id} 
                   className="snap-start flex-shrink-0 w-[180px] md:w-[200px] group cursor-pointer"
@@ -674,7 +619,7 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
                       alt={`${track.title} by ${track.artist}`} 
                       className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1000ms]" 
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
                     
                     <div className="absolute inset-0 p-4 flex flex-col justify-end">
                       <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
@@ -699,14 +644,14 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
           <div className="flex items-center justify-between mb-6 md:mb-8">
             <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-white font-['Inter'] uppercase leading-none">Your Collection</h2>
             <button 
-              onClick={() => onAddToQueue(trendingTracks[0] || MOCK_TRACKS[0])}
+              onClick={() => trendingTracks[0] && onAddToQueue(trendingTracks[0])}
               className="p-3 bg-white/5 border border-white/10 rounded-2xl text-zinc-400 hover:text-white hover:bg-white/10 transition-all"
             >
               <Plus size={24} />
             </button>
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-6">
-            {(trendingTracks.length > 0 ? trendingTracks : MOCK_TRACKS).map(track => (
+            {trendingTracks.map(track => (
               <div key={track.id} className="bg-white/[0.02] backdrop-blur-3xl hover:bg-white/[0.06] p-5 md:p-6 rounded-[40px] flex items-center gap-6 transition-all border border-white/5 group cursor-pointer active:scale-[0.98] shadow-xl">
                 <div className="relative w-20 h-20 md:w-24 md:h-24 rounded-[28px] overflow-hidden flex-shrink-0 shadow-lg border border-white/5" onClick={() => onTrackSelect(track)}>
                   <img src={track.coverArt} alt={`${track.title} by ${track.artist} album cover`} className="w-full h-full object-cover" />
