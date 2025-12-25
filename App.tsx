@@ -163,13 +163,13 @@ const App: React.FC = () => {
         return <GreenRoom />;
       case 'search':
         return (
-          <div className="p-6 md:p-12 animate-in fade-in duration-700 min-h-screen bg-black">
-            <div className="max-w-4xl mx-auto space-y-12 pb-32">
-              <header className="space-y-6">
-                <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white font-['Inter'] uppercase leading-none">
+          <div className="p-5 md:p-10 animate-in fade-in duration-700 min-h-screen bg-black">
+            <div className="max-w-4xl mx-auto space-y-10 pb-28">
+              <header className="space-y-5">
+                <h1 className="text-4xl md:text-6xl font-black tracking-tighter text-white font-['Inter'] uppercase leading-none">
                   Search
                 </h1>
-                <p className="text-zinc-500 text-xl font-medium font-['Roboto_Flex'] tracking-tight">
+                <p className="text-zinc-500 text-lg font-medium font-['Roboto_Flex'] tracking-tight">
                   Find your next favorite track
                 </p>
               </header>
@@ -185,47 +185,47 @@ const App: React.FC = () => {
                     }
                   }}
                   placeholder="Search for artists, songs, albums..."
-                  className="w-full bg-zinc-900/50 border border-white/10 px-16 py-6 rounded-[32px] text-xl text-white focus:outline-none focus:ring-2 focus:ring-red-600/40 focus:border-red-600/40 transition-all placeholder:text-zinc-700 font-['Roboto_Flex'] font-medium backdrop-blur-xl"
+                  className="w-full bg-zinc-900/50 border border-white/10 px-14 py-5 rounded-[28px] text-lg text-white focus:outline-none focus:ring-2 focus:ring-red-600/40 focus:border-red-600/40 transition-all placeholder:text-zinc-700 font-['Roboto_Flex'] font-medium backdrop-blur-xl"
                 />
-                <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-red-600 transition-colors" size={28} />
+                <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-zinc-600 group-focus-within:text-red-600 transition-colors" size={24} />
                 {isSearching && (
-                  <div className="absolute right-6 top-1/2 -translate-y-1/2">
-                    <div className="w-6 h-6 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
+                  <div className="absolute right-5 top-1/2 -translate-y-1/2">
+                    <div className="w-5 h-5 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
                   </div>
                 )}
               </div>
 
               {searchResults.length > 0 ? (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <h2 className="text-2xl font-black tracking-tight text-white font-['Inter'] uppercase">Results</h2>
+                <div className="space-y-5">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-black tracking-tight text-white font-['Inter'] uppercase">Results</h2>
                     <div className="h-px flex-1 bg-white/5" />
                   </div>
-                  <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
                     {searchResults.map((track) => (
                       <div 
                         key={track.id}
                         onClick={() => handleTrackSelect(track)}
-                        className="bg-zinc-900/40 hover:bg-zinc-800/60 p-5 rounded-[32px] cursor-pointer transition-all border border-white/5 group"
+                        className="bg-zinc-900/40 hover:bg-zinc-800/60 p-4 rounded-[28px] cursor-pointer transition-all border border-white/5 group"
                       >
                         <img 
                           src={track.coverArt} 
                           alt={`${track.title} by ${track.artist}`}
-                          className="w-full aspect-square rounded-[24px] mb-4 object-cover group-hover:scale-105 transition-transform duration-500"
+                          className="w-full aspect-square rounded-[20px] mb-3 object-cover group-hover:scale-105 transition-transform duration-500"
                         />
-                        <h3 className="font-black text-lg text-white truncate mb-1 font-['Inter'] uppercase leading-none">{track.title}</h3>
-                        <p className="text-zinc-600 font-black text-xs uppercase tracking-[0.3em] truncate font-['Roboto_Flex']">{track.artist}</p>
+                        <h3 className="font-black text-base text-white truncate mb-1 font-['Inter'] uppercase leading-none">{track.title}</h3>
+                        <p className="text-zinc-600 font-black text-[10px] uppercase tracking-[0.25em] truncate font-['Roboto_Flex']">{track.artist}</p>
                       </div>
                     ))}
                   </div>
                 </div>
               ) : (
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <h2 className="text-2xl font-black tracking-tight text-white font-['Inter'] uppercase">Recent Searches</h2>
+                <div className="space-y-5">
+                  <div className="flex items-center gap-3">
+                    <h2 className="text-xl font-black tracking-tight text-white font-['Inter'] uppercase">Recent Searches</h2>
                     <div className="h-px flex-1 bg-white/5" />
                   </div>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="flex flex-wrap gap-2.5">
                     {['The Weeknd', 'Blinding Lights', 'Kiss Land', 'After Hours'].map((term) => (
                       <button 
                         key={term}
@@ -233,7 +233,7 @@ const App: React.FC = () => {
                           setSearchQuery(term);
                           handleSearch(term);
                         }}
-                        className="px-6 py-3 bg-white/5 border border-white/10 rounded-[20px] text-sm font-black text-zinc-400 hover:text-white hover:bg-white/10 transition-all font-['Roboto_Flex'] uppercase tracking-[0.2em]"
+                        className="px-5 py-2.5 bg-white/5 border border-white/10 rounded-[18px] text-xs font-black text-zinc-400 hover:text-white hover:bg-white/10 transition-all font-['Roboto_Flex'] uppercase tracking-[0.15em]"
                       >
                         {term}
                       </button>
@@ -388,18 +388,55 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <nav className="hidden lg:flex flex-col w-[340px] flex-shrink-0 bg-gradient-to-b from-zinc-950/95 via-black/95 to-black/95 backdrop-blur-2xl border-r border-white/10 p-10 overflow-y-auto fixed left-0 top-0 bottom-0 z-40 shadow-[4px_0_24px_rgba(0,0,0,0.5)]">
+      <nav className="hidden lg:flex flex-col w-[240px] flex-shrink-0 bg-gradient-to-b from-zinc-950/95 via-black/95 to-black/95 backdrop-blur-2xl border-r border-white/10 p-6 overflow-y-auto fixed left-0 top-0 bottom-0 z-40 shadow-[4px_0_24px_rgba(0,0,0,0.5)]">
         {/* Logo */}
-        <div className="flex items-center gap-4 mb-16 pl-2">
-          <div className="relative w-14 h-14 bg-gradient-to-br from-red-600 to-red-700 rounded-[20px] flex-shrink-0 flex items-center justify-center shadow-[0_8px_32px_rgba(255,0,0,0.4),0_0_0_1px_rgba(255,255,255,0.1),inset_0_1px_0_rgba(255,255,255,0.2)]">
-            <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-[20px]" />
-            <div className="w-4 h-4 bg-white rounded-full animate-pulse relative z-10" />
+        {/* Interactive Vinyl Logo */}
+        <div className="flex items-center gap-3 mb-10 pl-1 group cursor-pointer" onClick={handlePlayPause}>
+          <div className="relative w-12 h-12 flex-shrink-0">
+            {/* Spinning Record */}
+            <div className={`w-full h-full rounded-full bg-zinc-900 border border-white/10 shadow-[0_4px_12px_rgba(0,0,0,0.8)] flex items-center justify-center relative z-10 ${isPlaying ? 'animate-[spin_3s_linear_infinite]' : 'transition-transform duration-700 ease-out group-hover:rotate-12'}`}>
+               {/* Vinyl Grooves Gradient */}
+               <div className="absolute inset-0 rounded-full bg-[conic-gradient(transparent_0deg,rgba(255,255,255,0.1)_90deg,transparent_180deg,rgba(255,255,255,0.1)_270deg,transparent_360deg)] opacity-50" />
+               <div className="absolute inset-1 rounded-full border border-white/5" />
+               <div className="absolute inset-2 rounded-full border border-white/5" />
+               <div className="absolute inset-3 rounded-full border border-white/5" />
+               
+               {/* Center Label */}
+               <div className="w-5 h-5 bg-red-600 rounded-full flex items-center justify-center relative overflow-hidden shadow-inner">
+                 <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/30" />
+                 <div className="w-1.5 h-1.5 bg-black rounded-full border border-white/20" />
+               </div>
+            </div>
+
+            {/* Tone Arm (Decorative) */}
+            <div className={`absolute -top-1 -right-1 w-6 h-10 pointer-events-none z-20 origin-top-right transition-transform duration-700 ease-in-out ${isPlaying ? 'rotate-[20deg]' : 'rotate-0'}`}>
+              <svg viewBox="0 0 24 40" className="w-full h-full drop-shadow-md">
+                 <path d="M20,2 C20,1 21,0 22,0 C23,0 24,1 24,2 L24,6 C24,7 23,8 22,8 C21,8 20,7 20,6 L20,2 Z" fill="#52525b" /> {/* Base */}
+                 <path d="M22,4 L12,25 C11,27 8,28 6,28 L2,30" stroke="#71717a" strokeWidth="2" fill="none" strokeLinecap="round" /> {/* Arm */}
+                 <rect x="0" y="28" width="6" height="8" rx="1" transform="rotate(-15 3 32)" fill="#3f3f46" /> {/* Cartridge */}
+              </svg>
+            </div>
           </div>
-          <span className="text-4xl font-black tracking-tighter text-white brand-cursive drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)]">Ye Beats</span>
+          
+          <div className="flex flex-col">
+            <span className="text-2xl font-black tracking-tighter text-white brand-cursive drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] leading-none">Ye Beats</span>
+            <div className="flex items-center gap-1.5">
+               <span className="text-[9px] font-black uppercase tracking-[0.3em] text-red-500 font-['Roboto_Flex']">
+                 {isPlaying ? 'Now Spinning' : 'V2 Audio'}
+               </span>
+               {isPlaying && (
+                 <div className="flex gap-0.5 items-end h-2">
+                   <div className="w-0.5 h-full bg-red-500 animate-[bounce_0.8s_infinite]" />
+                   <div className="w-0.5 h-2/3 bg-red-500 animate-[bounce_1.1s_infinite]" />
+                   <div className="w-0.5 h-3/4 bg-red-500 animate-[bounce_0.9s_infinite]" />
+                 </div>
+               )}
+            </div>
+          </div>
         </div>
 
         {/* Main Navigation */}
-        <div className="space-y-3 mb-8">
+        <div className="space-y-2 mb-6">
           {[
             { id: 'home', icon: Home, label: 'Home' },
             { id: 'new', icon: PlaySquare, label: 'Explore' },
@@ -410,64 +447,64 @@ const App: React.FC = () => {
             <button 
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)} 
-              className={`w-full flex items-center gap-5 px-6 py-4 rounded-[24px] font-black text-sm tracking-[0.1em] uppercase transition-all duration-300 relative group font-['Roboto_Flex'] ${
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-[18px] font-black text-xs tracking-[0.05em] uppercase transition-all duration-300 relative group font-['Roboto_Flex'] ${
                 activeTab === tab.id 
-                  ? 'bg-gradient-to-r from-white/15 to-white/10 text-white shadow-[0_8px_24px_rgba(255,255,255,0.08),inset_0_1px_0_rgba(255,255,255,0.2)] scale-[1.02] border border-white/20' 
+                  ? 'bg-gradient-to-r from-white/15 to-white/10 text-white shadow-[0_6px_18px_rgba(255,255,255,0.08),inset_0_1px_0_rgba(255,255,255,0.2)] scale-[1.01] border border-white/20' 
                   : 'text-zinc-500 hover:text-white hover:bg-white/5 border border-transparent'
               }`}
             >
               <div className={`transition-all duration-300 ${
                 activeTab === tab.id ? 'text-white scale-110' : 'text-zinc-500 group-hover:text-white'
               }`}>
-                <tab.icon size={24} strokeWidth={activeTab === tab.id ? 2.5 : 2} /> 
+                <tab.icon size={18} strokeWidth={activeTab === tab.id ? 2.5 : 2} /> 
               </div>
               <span className="flex-1 text-left">{tab.label}</span>
               {activeTab === tab.id && (
-                <div className="w-2 h-2 bg-red-600 rounded-full shadow-[0_0_12px_rgba(255,0,0,0.8)] animate-pulse" />
+                <div className="w-1.5 h-1.5 bg-red-600 rounded-full shadow-[0_0_8px_rgba(255,0,0,0.8)] animate-pulse" />
               )}
             </button>
           ))}
         </div>
 
         {/* Bottom Section */}
-        <div className="mt-auto space-y-6">
+        <div className="mt-auto space-y-4">
             {/* Audio Engine Card */}
-            <div className="p-6 rounded-[32px] bg-gradient-to-br from-red-600/15 to-red-600/5 border border-red-500/30 backdrop-blur-xl shadow-[0_8px_32px_rgba(255,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.1)]">
-                <p className="text-[10px] font-black tracking-[0.5em] text-red-400 uppercase mb-2 font-['Roboto_Flex']">Audio Engine</p>
-                <h6 className="text-white font-black text-base mb-4 leading-none brand-cursive">Ye V2 Audio</h6>
-                <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden border border-white/10">
-                    <div className="h-full bg-gradient-to-r from-red-600 to-red-500 w-[85%] animate-pulse shadow-[0_0_8px_rgba(255,0,0,0.5)]" />
+            <div className="p-4 rounded-[24px] bg-gradient-to-br from-red-600/15 to-red-600/5 border border-red-500/30 backdrop-blur-xl shadow-[0_6px_24px_rgba(255,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.1)]">
+                <p className="text-[9px] font-black tracking-[0.4em] text-red-400 uppercase mb-1.5 font-['Roboto_Flex']">Audio Engine</p>
+                <h6 className="text-white font-black text-sm mb-3 leading-none brand-cursive">Ye V2 Audio</h6>
+                <div className="w-full h-1 bg-black/40 rounded-full overflow-hidden border border-white/10">
+                    <div className="h-full bg-gradient-to-r from-red-600 to-red-500 w-[85%] animate-pulse shadow-[0_0_6px_rgba(255,0,0,0.5)]" />
                 </div>
             </div>
 
             {/* User Profile */}
-            <div className="border-t border-white/10 pt-6">
-              <div className="flex items-center gap-4 mb-4 p-4 rounded-[24px] hover:bg-white/5 transition-all cursor-pointer group">
+            <div className="border-t border-white/10 pt-4">
+              <div className="flex items-center gap-3 mb-3 p-3 rounded-[18px] hover:bg-white/5 transition-all cursor-pointer group">
                 <div className="relative">
-                  <img src={user?.avatar} alt="Profile" className="w-12 h-12 rounded-[18px] border-2 border-white/20 shadow-lg" />
-                  <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-2 border-black rounded-full" />
+                  <img src={user?.avatar} alt="Profile" className="w-9 h-9 rounded-[14px] border-2 border-white/20 shadow-lg" />
+                  <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 border-2 border-black rounded-full" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-black text-white truncate font-['Inter'] tracking-tight group-hover:text-red-400 transition-colors">{user?.name}</p>
-                  <p className="text-[10px] font-bold text-zinc-500 truncate uppercase tracking-[0.2em] font-['Roboto_Flex']">Premium</p>
+                  <p className="text-xs font-black text-white truncate font-['Inter'] tracking-tight group-hover:text-red-400 transition-colors">{user?.name}</p>
+                  <p className="text-[9px] font-bold text-zinc-500 truncate uppercase tracking-[0.15em] font-['Roboto_Flex']">Premium</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2">
-                <button className="flex items-center justify-center p-3 bg-white/5 rounded-[18px] text-zinc-400 hover:text-white hover:bg-white/10 transition-all border border-white/10">
-                  <UserIcon size={20} />
+                <button className="flex items-center justify-center p-2.5 bg-white/5 rounded-[14px] text-zinc-400 hover:text-white hover:bg-white/10 transition-all border border-white/10">
+                  <UserIcon size={16} />
                 </button>
                 <button 
                   onClick={handleLogout}
-                  className="flex items-center justify-center p-4 bg-red-600/10 rounded-2xl text-red-500 hover:bg-red-600/20 transition-all"
+                  className="flex items-center justify-center p-2.5 bg-red-600/10 rounded-[14px] text-red-500 hover:bg-red-600/20 transition-all"
                 >
-                  <LogOut size={20} />
+                  <LogOut size={16} />
                 </button>
               </div>
             </div>
         </div>
       </nav>
 
-      <main className="flex-1 h-full overflow-y-scroll bg-black relative scroll-smooth no-scrollbar touch-pan-y z-10">
+      <main className="flex-1 h-full overflow-y-scroll bg-black relative scroll-smooth no-scrollbar touch-pan-y z-10 lg:ml-[240px]">
         <div className="safe-bottom-mobile lg:safe-bottom-desktop">
           {renderContent()}
         </div>
@@ -542,7 +579,7 @@ const App: React.FC = () => {
         </div>
       </div>
 
-      <div className="hidden lg:block fixed bottom-12 left-[calc(50%+170px)] -translate-x-1/2 w-[calc(100%-700px)] z-[80]">
+      <div className="hidden lg:block fixed bottom-12 left-[calc(50%+120px)] -translate-x-1/2 w-[calc(100%-500px)] z-[80]">
         <BottomPlayer
           currentTrack={currentTrack}
           isPlaying={isPlaying}

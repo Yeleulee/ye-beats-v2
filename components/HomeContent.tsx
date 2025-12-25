@@ -272,12 +272,12 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
         <div className="absolute top-[20%] right-[-10%] w-[60%] h-[60%] bg-indigo-950/15 blur-[160px] rounded-full opacity-40" />
       </div>
 
-      <header className="sticky top-0 z-40 px-6 md:px-12 pt-12 pb-8 flex items-start justify-between transition-all duration-500 bg-gradient-to-b from-black via-black/60 to-transparent backdrop-blur-xl border-b border-white/5">
-        <div className="flex flex-col gap-3">
-          <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)] font-['Inter'] uppercase leading-none">
+      <header className="sticky top-0 z-40 px-6 md:px-8 lg:px-10 pt-6 md:pt-8 lg:pt-10 pb-4 md:pb-6 flex items-start justify-between transition-all duration-500 bg-gradient-to-b from-black via-black/60 to-transparent backdrop-blur-xl border-b border-white/5">
+        <div className="flex flex-col gap-1 md:gap-2">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tighter text-white drop-shadow-[0_4px_24px_rgba(0,0,0,0.8)] font-['Inter'] uppercase leading-none">
             {getGreeting()}
           </h1>
-          <p className="text-base md:text-xl font-bold text-zinc-500 tracking-tight font-['Roboto_Flex']">
+          <p className="text-xs md:text-sm lg:text-base font-bold text-zinc-500 tracking-tight font-['Roboto_Flex']">
             {getFormattedDate()}
           </p>
         </div>
@@ -285,10 +285,10 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
         <div className="relative">
           <button 
             onClick={() => setShowProfileMenu(!showProfileMenu)}
-            className="relative w-12 h-12 md:w-14 md:h-14 rounded-full overflow-hidden border-2 border-white/20 shadow-2xl cursor-pointer hover:scale-110 active:scale-95 transition-all z-50 ring-2 ring-red-500/20"
+            className="relative w-10 h-10 md:w-11 md:h-11 lg:w-12 lg:h-12 rounded-full overflow-hidden border-2 border-white/20 shadow-2xl cursor-pointer hover:scale-110 active:scale-95 transition-all z-50 ring-2 ring-red-500/20"
           >
             <img src="https://i.pravatar.cc/150?u=ye_user" alt="Profile" className="w-full h-full object-cover" />
-            <div className="absolute bottom-0 right-0 w-4 h-4 bg-emerald-500 border-2 border-black rounded-full" />
+            <div className="absolute bottom-0 right-0 w-3 h-3 bg-emerald-500 border-2 border-black rounded-full" />
           </button>
 
           {showProfileMenu && (
@@ -399,48 +399,71 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
 
       <div className="relative z-10">
         {/* Time-based Contextual Recommendations */}
-        <section className="px-6 md:px-12 mb-16 mt-8">
-          <div className="space-y-6">
+        <section className="px-6 md:px-8 lg:px-10 mb-10 md:mb-12 mt-4 md:mt-6">
+          <div className="space-y-3 md:space-y-4">
             <div>
-              <h2 className="text-2xl md:text-3xl font-black tracking-tighter text-white font-['Inter'] uppercase mb-2">
+              <h2 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-black tracking-tighter text-white font-['Inter'] uppercase mb-1 md:mb-2">
                 {recommendations.title}
               </h2>
-              <p className="text-zinc-500 text-sm md:text-base font-medium font-['Roboto_Flex']">
+              <p className="text-zinc-500 text-xs md:text-sm font-medium font-['Roboto_Flex']">
                 {recommendations.description}
               </p>
             </div>
 
-            <div className="flex overflow-x-auto gap-4 md:gap-6 no-scrollbar pb-4 -mx-2 px-2 scroll-smooth snap-x snap-mandatory">
+            <div className="flex overflow-x-auto gap-3 md:gap-4 no-scrollbar pb-3 md:pb-4 -mx-2 px-2 scroll-smooth snap-x snap-mandatory">
               {recommendations.tracks.map((track) => (
                 <div 
                   key={track.id}
                   onClick={() => onTrackSelect(track)}
-                  className="snap-start flex-shrink-0 w-[280px] md:w-[320px] rounded-[40px] overflow-hidden cursor-pointer transition-all hover:scale-[1.02] active:scale-[0.98] group relative"
+                  className="snap-start flex-shrink-0 w-[220px] sm:w-[240px] md:w-[260px] lg:w-[280px] group cursor-pointer"
                 >
-                  <div className={`absolute inset-0 bg-gradient-to-br ${recommendations.color} opacity-80`} />
-                  <div className="relative z-10 p-6 md:p-8 flex flex-col h-full backdrop-blur-sm">
-                    <div className="flex-1 mb-6">
-                      <img 
-                        src={track.coverArt} 
-                        alt={`${track.title} by ${track.artist}`}
-                        className="w-full aspect-square rounded-[32px] object-cover shadow-2xl group-hover:scale-105 transition-transform duration-500"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <h3 className="text-2xl md:text-3xl font-black text-white tracking-tighter leading-none font-['Inter'] uppercase truncate">
-                        {track.title}
-                      </h3>
-                      <p className="text-white/80 text-sm font-bold font-['Roboto_Flex'] uppercase tracking-[0.2em] truncate">
-                        {track.artist}
-                      </p>
-                      <div className="flex items-center gap-2 pt-2">
-                        <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-white rounded-full" 
-                            style={{ width: `${(track.heatmap?.reduce((a, b) => a + b, 0) || 0) / (track.heatmap?.length || 1) * 100}%` }}
-                          />
+                  <div className="relative h-[280px] md:h-[320px] rounded-[32px] overflow-hidden border border-white/10 hover:border-white/20 hover:scale-[1.02] transition-all duration-500 shadow-2xl">
+                    {/* Background Image */}
+                    <img 
+                      src={track.coverArt} 
+                      alt={`${track.title} by ${track.artist}`}
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1000ms]"
+                    />
+                    
+                    {/* Gradient Overlay */}
+                    <div className={`absolute inset-0 bg-gradient-to-t ${recommendations.color} via-black/40 to-black/20 opacity-90 group-hover:opacity-80 transition-opacity`} />
+                    
+                    {/* Content Overlay */}
+                    <div className="absolute inset-0 p-5 flex flex-col justify-between z-10">
+                      {/* Top: Heatmap/Indicator */}
+                      <div className="flex justify-between items-start">
+                        <div className="inline-block px-2.5 py-1 bg-black/30 backdrop-blur-md rounded-full border border-white/10">
+                          <div className="flex items-center gap-1.5">
+                            <Music2 size={10} className="text-white" />
+                            <span className="text-[8px] font-black text-white uppercase tracking-[0.2em] font-['Roboto_Flex']">
+                              Track
+                            </span>
+                          </div>
                         </div>
-                        <Play className="text-white" size={24} fill="white" />
+                      </div>
+
+                      {/* Bottom: Info & Play */}
+                      <div className="space-y-3">
+                        <div>
+                          <h3 className="text-xl md:text-2xl font-black text-white tracking-tighter leading-none font-['Inter'] uppercase mb-1 drop-shadow-lg line-clamp-2">
+                            {track.title}
+                          </h3>
+                          <p className="text-white/90 text-[10px] md:text-xs font-bold font-['Roboto_Flex'] uppercase tracking-[0.2em] truncate drop-shadow-md">
+                            {track.artist}
+                          </p>
+                        </div>
+                        
+                        <div className="flex items-center gap-3">
+                          <button className="w-10 h-10 bg-white text-black rounded-full flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-lg">
+                            <Play size={18} fill="black" className="ml-0.5" />
+                          </button>
+                          <div className="flex-1 h-1 bg-white/20 rounded-full overflow-hidden backdrop-blur-sm">
+                            <div 
+                              className="h-full bg-white rounded-full shadow-[0_0_10px_rgba(255,255,255,0.5)]" 
+                              style={{ width: `${(track.heatmap?.reduce((a, b) => a + b, 0) || 0) / (track.heatmap?.length || 1) * 100}%` }}
+                            />
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -448,27 +471,31 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
               ))}
               
               {/* Add more button to explore */}
-              <div className="snap-start flex-shrink-0 w-[280px] md:w-[320px] rounded-[40px] bg-white/5 border-2 border-white/10 border-dashed flex items-center justify-center cursor-pointer hover:bg-white/10 transition-all backdrop-blur-sm">
-                <div className="text-center space-y-4 p-8">
-                  <div className="w-16 h-16 mx-auto bg-white/10 rounded-full flex items-center justify-center">
-                    <Plus size={32} className="text-white" />
+              <div className="snap-start flex-shrink-0 w-[220px] sm:w-[240px] md:w-[260px] lg:w-[280px] group cursor-pointer">
+                <div className="relative h-[280px] md:h-[320px] rounded-[32px] overflow-hidden bg-white/[0.02] border border-white/10 hover:bg-white/5 hover:border-white/20 hover:scale-[1.02] transition-all duration-300 backdrop-blur-md flex items-center justify-center">
+                  <div className="text-center space-y-3 p-6">
+                    <div className="w-12 h-12 md:w-14 md:h-14 mx-auto bg-white/5 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg border border-white/10">
+                      <Plus size={24} className="md:w-7 md:h-7 text-white" />
+                    </div>
+                    <div>
+                      <p className="text-white font-black text-base uppercase tracking-tight font-['Inter'] mb-1">
+                        Explore More
+                      </p>
+                      <p className="text-zinc-500 text-xs font-medium font-['Roboto_Flex'] group-hover:text-zinc-400 transition-colors">
+                        Discover {recommendations.mood} tracks
+                      </p>
+                    </div>
                   </div>
-                  <p className="text-white font-black text-lg uppercase tracking-tight font-['Inter']">
-                    Explore More
-                  </p>
-                  <p className="text-zinc-400 text-xs font-medium font-['Roboto_Flex']">
-                    Discover tracks for {recommendations.mood}
-                  </p>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        <section className="mb-20 mt-8">
-          <div className="px-6 md:px-12 mb-8">
-            <div className="flex items-end justify-between mb-6">
-              <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-white font-['Inter'] uppercase">Your 2025</h2>
+        <section className="mb-12 md:mb-16 mt-4 md:mt-6">
+          <div className="px-6 md:px-8 lg:px-10 mb-4 md:mb-6">
+            <div className="flex items-end justify-between mb-3 md:mb-4">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-white font-['Inter'] uppercase">Your 2025</h2>
             </div>
             
             <div className="flex items-center gap-3 overflow-x-auto no-scrollbar pb-4">
@@ -495,46 +522,47 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
             </div>
           </div>
 
-          <div className="flex overflow-x-auto gap-6 px-6 md:px-12 no-scrollbar pb-8 snap-x snap-mandatory scroll-smooth touch-pan-x">
+          <div className="flex overflow-x-auto gap-3 md:gap-4 px-6 md:px-8 lg:px-10 no-scrollbar pb-4 md:pb-6 snap-x snap-mandatory scroll-smooth touch-pan-x">
             {/* Personalized Replay 2025 Card */}
             <div 
               onClick={() => onTrackSelect(trendingTracks[0] || MOCK_TRACKS[0])}
-              className="snap-center flex-shrink-0 w-[85vw] md:w-[500px] rounded-[48px] overflow-hidden relative shadow-[0_40px_80px_-20px_rgba(0,0,0,0.9)] border border-white/10 active:scale-[0.98] transition-all group cursor-pointer hover:border-white/20"
+              className="snap-center flex-shrink-0 w-[75vw] sm:w-[340px] md:w-[380px] lg:w-[420px] rounded-[32px] md:rounded-[40px] overflow-hidden relative shadow-[0_20px_45px_-10px_rgba(0,0,0,0.9)] border border-white/10 active:scale-[0.98] transition-all group cursor-pointer hover:border-white/20"
             >
-              <div className="absolute inset-0 bg-gradient-to-br from-red-600 via-purple-600 to-blue-600 opacity-90" />
-              <div className="absolute inset-0 p-8 md:p-12 flex flex-col justify-between z-10">
-                <div className="space-y-4">
-                  <div className="w-14 h-14 rounded-[20px] bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center text-white shadow-xl">
-                    <Play size={28} fill="white" />
+              <div className="absolute inset-0 bg-gradient-to-br from-red-600 via-purple-600 to-blue-600 opacity-60 group-hover:opacity-70 transition-opacity" />
+              <div className="absolute inset-0 backdrop-blur-2xl" />
+              <div className="absolute inset-0 p-5 sm:p-6 md:p-8 flex flex-col justify-between z-10">
+                <div className="space-y-2 md:space-y-3">
+                  <div className="w-10 h-10 md:w-12 md:h-12 rounded-[14px] md:rounded-[16px] bg-white/20 backdrop-blur-xl border border-white/30 flex items-center justify-center text-white shadow-xl">
+                    <Play size={20} className="md:w-6 md:h-6" fill="white" />
                   </div>
                   <div>
-                    <h3 className="text-5xl md:text-7xl font-black tracking-tighter leading-[0.85] text-white font-['Inter'] uppercase mb-2">
+                    <h3 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tighter leading-[0.85] text-white font-['Inter'] uppercase mb-1">
                       Replay
                     </h3>
-                    <span className="text-4xl md:text-6xl font-black tracking-tighter text-white/70 font-['Inter'] uppercase">2025</span>
+                    <span className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black tracking-tighter text-white/70 font-['Inter'] uppercase">2025</span>
                   </div>
                 </div>
                 
-                <div className="space-y-6">
+                <div className="space-y-3 md:space-y-4">
                   {/* Personalized Stats */}
                   <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white/10 backdrop-blur-xl rounded-[24px] p-4 border border-white/20">
+                    <div className="bg-white/5 backdrop-blur-xl rounded-[24px] p-4 border border-white/10">
                       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/60 mb-1 font-['Roboto_Flex']">Total Hours</p>
                       <p className="text-3xl font-black text-white font-['Inter']">{stats.totalHours}h</p>
                     </div>
-                    <div className="bg-white/10 backdrop-blur-xl rounded-[24px] p-4 border border-white/20">
+                    <div className="bg-white/5 backdrop-blur-xl rounded-[24px] p-4 border border-white/10">
                       <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/60 mb-1 font-['Roboto_Flex']">Songs</p>
                       <p className="text-3xl font-black text-white font-['Inter']">{stats.totalTracks}</p>
                     </div>
                   </div>
                   
-                  <div className="bg-white/10 backdrop-blur-xl rounded-[24px] p-4 border border-white/20">
+                  <div className="bg-white/5 backdrop-blur-xl rounded-[24px] p-4 border border-white/10">
                     <p className="text-[10px] font-black uppercase tracking-[0.4em] text-white/60 mb-2 font-['Roboto_Flex']">Top Artist</p>
                     <p className="text-xl font-black text-white font-['Inter'] tracking-tight">{stats.topArtist}</p>
                     <p className="text-xs font-bold text-white/70 mt-1 font-['Roboto_Flex']">{stats.topGenre}</p>
                   </div>
                   
-                  <button className="w-full bg-white/15 hover:bg-white/25 backdrop-blur-xl text-white py-4 rounded-[24px] font-black text-sm uppercase tracking-[0.3em] transition-all border border-white/30 font-['Roboto_Flex']">
+                  <button className="w-full bg-white/10 hover:bg-white/20 backdrop-blur-xl text-white py-4 rounded-[24px] font-black text-sm uppercase tracking-[0.3em] transition-all border border-white/20 font-['Roboto_Flex'] hover:border-white/30">
                     View Full Replay
                   </button>
                 </div>
@@ -546,17 +574,17 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
         </section>
 
         {/* Podcast Recommendations */}
-        <section className="mb-20">
-          <div className="px-6 md:px-12 mb-10">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-white font-['Inter'] uppercase">
+        <section className="mb-12 md:mb-16">
+          <div className="px-6 md:px-8 lg:px-10 mb-6 md:mb-8">
+            <div className="flex items-center justify-between mb-2 md:mb-3">
+              <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-white font-['Inter'] uppercase">
                 Podcasts for You
               </h2>
-              <button className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.5em] hover:text-white transition-all font-['Roboto_Flex']">
+              <button className="text-[9px] md:text-[10px] font-black text-zinc-500 uppercase tracking-[0.4em] md:tracking-[0.5em] hover:text-white transition-all font-['Roboto_Flex']">
                 See All
               </button>
             </div>
-            <p className="text-zinc-500 text-sm md:text-base font-medium font-['Roboto_Flex']">
+            <p className="text-zinc-500 text-xs md:text-sm font-medium font-['Roboto_Flex']">
               Discover stories, insights, and conversations
             </p>
           </div>
@@ -568,7 +596,7 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
                 className="snap-start flex-shrink-0 w-[280px] md:w-[320px] group cursor-pointer"
               >
                 {/* Card with full-bleed cover image */}
-                <div className="relative h-[360px] md:h-[400px] rounded-[40px] overflow-hidden border border-white/20 hover:scale-[1.02] transition-all duration-500 shadow-2xl">
+                <div className="relative h-[360px] md:h-[400px] rounded-[40px] overflow-hidden border border-white/10 hover:scale-[1.02] hover:border-white/20 transition-all duration-500 shadow-2xl">
                   {/* Background image */}
                   <img 
                     src={podcast.cover} 
@@ -621,9 +649,9 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
           </div>
         </section>
 
-        <section className="mb-20">
-          <div className="px-6 md:px-12 mb-10 flex items-center justify-between">
-            <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-white font-['Inter'] uppercase">
+        <section className="mb-12 md:mb-16">
+          <div className="px-6 md:px-8 lg:px-10 mb-6 md:mb-8 flex items-center justify-between">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-white font-['Inter'] uppercase">
               Recently Played
             </h2>
           </div>
@@ -633,18 +661,33 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
               <div className="text-zinc-500 text-xl font-medium font-['Roboto_Flex']">Loading tracks...</div>
             </div>
           ) : (
-            <div className="flex overflow-x-auto gap-6 md:gap-8 px-6 md:px-12 no-scrollbar snap-x scroll-smooth touch-pan-x">
+            <div className="flex overflow-x-auto gap-4 md:gap-6 px-6 md:px-8 lg:px-10 no-scrollbar snap-x scroll-smooth touch-pan-x">
               {(recentlyPlayedTracks.length > 0 ? recentlyPlayedTracks : MOCK_TRACKS).map((track) => (
-                <div key={track.id} className="snap-start flex-shrink-0 w-[180px] md:w-[240px] group cursor-pointer active:scale-95 transition-all">
-                  <div className="relative aspect-square mb-6 rounded-[40px] overflow-hidden shadow-2xl bg-zinc-900 border border-white/5">
-                    <img src={track.coverArt} alt={`${track.title} by ${track.artist} album cover`} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1200ms]" />
-                    <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center backdrop-blur-[8px] gap-4">
-                       <button onClick={(e) => { e.stopPropagation(); onTrackSelect(track); }} className="w-14 h-14 bg-white/10 rounded-full flex items-center justify-center hover:bg-white hover:text-black transition-all"><Play size={24} fill="currentColor" /></button>
+                <div 
+                  key={track.id} 
+                  className="snap-start flex-shrink-0 w-[180px] md:w-[200px] group cursor-pointer"
+                  onClick={() => onTrackSelect(track)}
+                >
+                  <div className="relative h-[220px] md:h-[240px] rounded-[28px] overflow-hidden border border-white/10 hover:border-white/20 hover:scale-[1.02] transition-all duration-500 shadow-xl bg-zinc-900">
+                    <img 
+                      src={track.coverArt} 
+                      alt={`${track.title} by ${track.artist}`} 
+                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-[1000ms]" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent opacity-80 group-hover:opacity-60 transition-opacity" />
+                    
+                    <div className="absolute inset-0 p-4 flex flex-col justify-end">
+                      <div className="transform translate-y-2 group-hover:translate-y-0 transition-transform duration-300">
+                        <h4 className="text-lg font-black truncate text-white tracking-tighter leading-none font-['Inter'] uppercase mb-1 drop-shadow-md">{track.title}</h4>
+                        <p className="text-[10px] text-zinc-300 font-black truncate uppercase tracking-[0.2em] font-['Roboto_Flex'] drop-shadow-sm">{track.artist}</p>
+                        
+                        <div className="mt-3 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex justify-end">
+                           <div className="w-8 h-8 bg-white text-black rounded-full flex items-center justify-center shadow-lg">
+                             <Play size={14} fill="black" className="ml-0.5" />
+                           </div>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                  <div className="space-y-2 px-2" onClick={() => onTrackSelect(track)}>
-                    <h4 className="text-lg md:text-xl font-black truncate text-white tracking-tighter leading-none font-['Inter'] uppercase">{track.title}</h4>
-                    <p className="text-[11px] md:text-xs text-zinc-600 font-black truncate uppercase tracking-[0.3em] font-['Roboto_Flex']">{track.artist}</p>
                   </div>
                 </div>
               ))}
@@ -652,9 +695,9 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
           )}
         </section>
 
-        <section className="px-6 md:px-12 pb-32">
-          <div className="flex items-center justify-between mb-10">
-            <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-white font-['Inter'] uppercase leading-none">Your Collection</h2>
+        <section className="px-6 md:px-8 lg:px-10 pb-24 md:pb-28">
+          <div className="flex items-center justify-between mb-6 md:mb-8">
+            <h2 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black tracking-tighter text-white font-['Inter'] uppercase leading-none">Your Collection</h2>
             <button 
               onClick={() => onAddToQueue(trendingTracks[0] || MOCK_TRACKS[0])}
               className="p-3 bg-white/5 border border-white/10 rounded-2xl text-zinc-400 hover:text-white hover:bg-white/10 transition-all"

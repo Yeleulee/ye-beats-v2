@@ -96,7 +96,7 @@ const BottomPlayer: React.FC<BottomPlayerProps> = ({
 
   return (
     <div 
-      className="w-full lg:max-w-4xl lg:mx-auto h-[76px] bg-zinc-900/95 backdrop-blur-3xl rounded-2xl border border-white/10 flex items-center justify-between px-4 select-none shadow-[0_25px_60px_-10px_rgba(0,0,0,0.8)] relative overflow-hidden transition-all duration-300 active:scale-[0.99] group cursor-pointer"
+      className="w-full lg:max-w-6xl xl:max-w-7xl lg:mx-auto h-[68px] md:h-[72px] bg-zinc-900/95 backdrop-blur-3xl rounded-xl md:rounded-2xl border border-white/10 flex items-center justify-between px-3 md:px-4 select-none shadow-[0_20px_50px_-10px_rgba(0,0,0,0.8)] relative overflow-hidden transition-all duration-300 active:scale-[0.99] group cursor-pointer"
       onClick={(e) => {
         const isAction = (e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('.interactive-bar');
         if (!isAction) {

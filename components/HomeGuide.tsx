@@ -4,24 +4,24 @@ import { Sparkles, Clock, Music2, Zap, ArrowRight, Layout, Heart } from 'lucide-
 
 const HomeGuide: React.FC = () => {
   return (
-    <section className="mb-12 animate-in fade-in slide-in-from-top-4 duration-1000">
-      <div className="relative overflow-hidden rounded-[32px] bg-zinc-950 border border-white/5 p-8 md:p-10 group">
+    <section className="mb-8 md:mb-10 animate-in fade-in slide-in-from-top-4 duration-1000">
+      <div className="relative overflow-hidden rounded-[24px] md:rounded-[28px] bg-zinc-950 border border-white/5 p-6 md:p-8 group">
         {/* Decorative Background Elements */}
-        <div className="absolute top-0 right-0 w-96 h-96 bg-red-600/10 blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-red-600/15 transition-colors duration-700" />
-        <div className="absolute bottom-0 left-0 w-64 h-64 bg-emerald-500/5 blur-[80px] translate-y-1/2 -translate-x-1/2" />
+        <div className="absolute top-0 right-0 w-64 h-64 md:w-80 md:h-80 bg-red-600/10 blur-[80px] md:blur-[100px] -translate-y-1/2 translate-x-1/2 group-hover:bg-red-600/15 transition-colors duration-700" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 md:w-56 md:h-56 bg-emerald-500/5 blur-[60px] md:blur-[80px] translate-y-1/2 -translate-x-1/2" />
 
-        <div className="relative z-10 flex flex-col lg:flex-row gap-10 items-start">
-          <div className="flex-1 space-y-6">
-            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-xs font-black tracking-widest text-zinc-400 uppercase">
-              <Sparkles size={14} className="text-red-500" />
+        <div className="relative z-10 flex flex-col lg:flex-row gap-6 md:gap-8 items-start">
+          <div className="flex-1 space-y-4 md:space-y-5">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-[10px] md:text-xs font-black tracking-wider text-zinc-400 uppercase">
+              <Sparkles size={12} className="text-red-500" />
               Inside Your Home Feed
             </div>
             
-            <h2 className="text-4xl md:text-5xl font-black tracking-tighter leading-none text-white">
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black tracking-tighter leading-none text-white">
               Your music universe, <span className="text-zinc-500 brand-cursive">aligned by Ye.</span>
             </h2>
             
-            <p className="text-zinc-400 text-lg font-medium leading-relaxed max-w-2xl">
+            <p className="text-zinc-400 text-sm md:text-base lg:text-lg font-medium leading-relaxed max-w-2xl">
               Ye Beats is the living heart of your audio journey. It doesn't just show music; it learns your rhythm, adapting every second to your history, likes, and deep-archive explorations.
             </p>
 
