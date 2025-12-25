@@ -122,7 +122,11 @@ const TheCrate: React.FC = () => {
             {playlist.map((item, i) => (
               <div key={i} className="group bg-zinc-900/40 hover:bg-zinc-800/60 p-4 rounded-[20px] flex items-center gap-4 border border-white/5 transition-all cursor-pointer">
                 <div className="w-14 h-14 bg-zinc-800 rounded-xl flex items-center justify-center text-zinc-500 shadow-md overflow-hidden relative">
-                   <Music size={24} className="relative z-10" />
+                   {item.coverArt ? (
+                     <img src={item.coverArt} alt={item.title} className="w-full h-full object-cover" />
+                   ) : (
+                     <Music size={24} className="relative z-10" />
+                   )}
                 </div>
                 <div className="flex-1 min-w-0">
                   <h4 className="font-black text-lg truncate text-white mb-1 font-['Inter'] uppercase leading-none">{item.title}</h4>

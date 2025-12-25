@@ -368,7 +368,7 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
                     />
                     
                     {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent opacity-80 group-hover:opacity-70 transition-opacity" />
+                    <div className={`absolute inset-0 bg-gradient-to-t ${recommendations.color} via-black/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity`} />
                     
                     {/* Content Overlay */}
                     <div className="absolute inset-0 p-5 flex flex-col justify-between z-10">
@@ -547,7 +547,7 @@ const HomeContent: React.FC<HomeContentProps> = ({ onTrackSelect, onAddToQueue, 
                   />
                   
                   {/* Gradient overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black via-black/10 to-transparent opacity-90" />
+                  <div className={`absolute inset-0 bg-gradient-to-t ${podcast.color} via-black/10 to-transparent opacity-90`} />
                   
                   {/* Content overlay */}
                   <div className="absolute inset-0 p-6 flex flex-col justify-between">

@@ -96,7 +96,7 @@ const BottomPlayer: React.FC<BottomPlayerProps> = ({
 
   return (
     <div 
-      className="w-full lg:max-w-2xl lg:mx-auto h-[52px] bg-zinc-900/95 backdrop-blur-3xl rounded-xl md:rounded-full border border-white/10 flex items-center justify-between px-3 md:px-4 select-none shadow-[0_20px_40px_-10px_rgba(0,0,0,0.8)] relative overflow-hidden transition-all duration-300 active:scale-[0.99] group cursor-pointer"
+      className="w-full lg:max-w-6xl xl:max-w-7xl lg:mx-auto h-[68px] md:h-[72px] bg-zinc-900/95 backdrop-blur-3xl rounded-xl md:rounded-2xl border border-white/10 flex items-center justify-between px-3 md:px-4 select-none shadow-[0_20px_50px_-10px_rgba(0,0,0,0.8)] relative overflow-hidden transition-all duration-300 active:scale-[0.99] group cursor-pointer"
       onClick={(e) => {
         const isAction = (e.target as HTMLElement).closest('button') || (e.target as HTMLElement).closest('.interactive-bar');
         if (!isAction) {
@@ -107,7 +107,7 @@ const BottomPlayer: React.FC<BottomPlayerProps> = ({
       {/* Interactive Progress Bar Layer */}
       <div 
         ref={progressRef}
-        className="interactive-bar absolute top-0 left-0 w-full h-[2px] bg-white/5 cursor-pointer hover:h-[4px] transition-all group/bar z-10"
+        className="interactive-bar absolute top-0 left-0 w-full h-[4px] bg-white/5 cursor-pointer hover:h-[6px] transition-all group/bar z-10"
         onClick={handleScrub}
         onMouseDown={(e) => {
           e.stopPropagation();
@@ -119,9 +119,9 @@ const BottomPlayer: React.FC<BottomPlayerProps> = ({
              }
           };
           const onUp = () => {
-             window.removeEventListener('mousemove', onMove);
-             window.removeEventListener('mouseup', onUp);
-           };
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('mouseup', onUp);
+          };
           window.addEventListener('mousemove', onMove);
           window.addEventListener('mouseup', onUp);
         }}
@@ -130,89 +130,89 @@ const BottomPlayer: React.FC<BottomPlayerProps> = ({
           className="h-full bg-red-600 transition-all duration-300 relative" 
           style={{ width: `${progress * 100}%` }} 
         >
-          <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-2 h-2 bg-red-600 rounded-full opacity-0 group-hover/bar:opacity-100 shadow-[0_0_8px_rgba(239,68,68,1)]" />
+          <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-3 h-3 bg-red-600 rounded-full opacity-0 group-hover/bar:opacity-100 shadow-[0_0_12px_rgba(239,68,68,1)]" />
         </div>
       </div>
 
       {/* Left: Metadata */}
-      <div className="flex items-center gap-3 min-w-0 pr-2 md:pr-4">
-        <div className="relative w-8 h-8 flex-shrink-0">
+      <div className="flex items-center gap-4 min-w-0 pr-4">
+        <div className="relative w-12 h-12 flex-shrink-0">
           <img 
             src={currentTrack.coverArt} 
             alt={currentTrack.title} 
-            className="w-full h-full rounded-full md:rounded-lg object-cover shadow-sm border border-white/5 transition-transform group-hover:scale-105"
+            className="w-full h-full rounded-xl object-cover shadow-2xl border border-white/5 transition-transform group-hover:scale-105"
           />
         </div>
         <div className="min-w-0">
-          <div className="flex items-center gap-1.5">
-            <h4 className="font-black text-xs text-white truncate leading-tight tracking-tight">
+          <div className="flex items-center gap-2">
+            <h4 className="font-black text-[14px] text-white truncate leading-tight tracking-tight">
               {currentTrack.title}
             </h4>
             {renderQualityIcon()}
           </div>
-          <p className="text-[9px] text-zinc-500 font-bold truncate tracking-tight uppercase tracking-wider">
+          <p className="text-[11px] text-zinc-500 font-bold truncate tracking-tight uppercase tracking-wider">
             {currentTrack.artist}
           </p>
         </div>
       </div>
 
       {/* Center/Right: Essential Controls */}
-      <div className="flex items-center gap-1 md:gap-2">
-        {/* Animated Queue Indicator */}
+      <div className="flex items-center gap-1 md:gap-3">
+        {/* Animated Queue Indicator - Now Clickable */}
         <button 
           onClick={(e) => { e.stopPropagation(); onExpand('queue'); }}
-          className={`hidden md:flex items-center gap-1.5 px-2 py-1 bg-white/5 rounded-full border border-white/5 text-[8px] font-black transition-all hover:bg-white/10 active:scale-90 ${queueCount > 0 ? 'text-red-600 border-red-600/20' : 'text-zinc-400'}`}
+          className={`flex items-center gap-2 px-3 py-1.5 bg-white/5 rounded-full border border-white/5 text-[9px] font-black transition-all hover:bg-white/10 active:scale-90 ${queueCount > 0 ? 'text-red-600 border-red-600/20' : 'text-zinc-400'}`}
         >
-          <ListMusic size={10} className={queueCount > 0 ? 'animate-pulse' : ''} />
+          <ListMusic size={12} className={queueCount > 0 ? 'animate-pulse' : ''} />
           {queueCount}
         </button>
 
         {/* Desktop Mini Volume */}
-        <div className="hidden lg:flex items-center gap-2 pl-3 pr-4 py-1.5 bg-white/5 rounded-full border border-white/5 group/volume_container transition-all hover:bg-white/10">
+        <div className="hidden md:flex items-center gap-3 pl-4 pr-6 py-2 bg-white/5 rounded-full border border-white/5 group/volume_container transition-all hover:bg-white/10">
           <button 
             onClick={(e) => { e.stopPropagation(); setVolume(volume === 0 ? 0.8 : 0); }}
             className="text-zinc-500 hover:text-white transition-colors"
           >
-            {volume === 0 ? <VolumeX size={14} /> : volume < 0.5 ? <Volume1 size={14} /> : <Volume2 size={14} />}
+            {renderVolumeIcon()}
           </button>
           <div 
             ref={volumeRef}
             onMouseDown={handleVolumeMouseDown}
-            className="interactive-bar w-16 h-1 bg-zinc-800 rounded-full relative cursor-pointer group/vol-bar overflow-visible"
+            className="interactive-bar w-24 h-1.5 bg-zinc-800 rounded-full relative cursor-pointer group/vol-bar overflow-visible"
           >
             <div 
               className={`absolute left-0 top-0 h-full rounded-full transition-colors ${isDraggingVolume ? 'bg-red-600' : 'bg-zinc-400 group-hover/volume_container:bg-red-500'}`} 
               style={{ width: `${volume * 100}%` }}
             >
-               <div className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-2.5 h-2.5 bg-white rounded-full shadow-lg transition-all ${isDraggingVolume ? 'scale-125 opacity-100' : 'scale-0 group-hover/vol-bar:scale-100 opacity-0 group-hover/vol-bar:opacity-100'}`} />
+               <div className={`absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 w-3 h-3 bg-white rounded-full shadow-lg transition-all ${isDraggingVolume ? 'scale-125 opacity-100' : 'scale-0 group-hover/vol-bar:scale-100 opacity-0 group-hover/vol-bar:opacity-100'}`} />
             </div>
           </div>
         </div>
 
-        <div className="flex items-center gap-0.5">
+        <div className="flex items-center gap-1">
           <button 
             onClick={(e) => { e.stopPropagation(); onPrevious(); }}
-            className="p-2 text-zinc-500 hover:text-white hover:bg-white/5 rounded-full transition-all active:scale-75"
+            className="p-2.5 text-zinc-500 hover:text-white hover:bg-white/5 rounded-full transition-all active:scale-75"
           >
-            <SkipBack size={16} fill="currentColor" />
+            <SkipBack size={20} fill="currentColor" />
           </button>
           
           <button 
             onClick={(e) => { e.stopPropagation(); onPlayPause(); }}
-            className="p-2 bg-white text-black rounded-full hover:scale-110 transition-all active:scale-90 shadow-[0_4px_12px_rgba(255,255,255,0.2)]"
+            className="p-3 bg-white text-black rounded-full hover:scale-110 transition-all active:scale-90 shadow-[0_10px_30px_rgba(255,255,255,0.2)]"
           >
             {isPlaying ? (
-              <Pause size={18} fill="currentColor" />
+              <Pause size={24} fill="currentColor" />
             ) : (
-              <Play size={18} fill="currentColor" className="ml-0.5" />
+              <Play size={24} fill="currentColor" className="ml-1" />
             )}
           </button>
 
           <button 
             onClick={(e) => { e.stopPropagation(); onNext(); }}
-            className="p-2 text-zinc-500 hover:text-white hover:bg-white/5 rounded-full transition-all active:scale-75"
+            className="p-2.5 text-zinc-500 hover:text-white hover:bg-white/5 rounded-full transition-all active:scale-75"
           >
-            <SkipForward size={16} fill="currentColor" />
+            <SkipForward size={20} fill="currentColor" />
           </button>
         </div>
       </div>
