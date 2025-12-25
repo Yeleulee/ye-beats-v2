@@ -1,3 +1,4 @@
+
 import React, { useRef, useCallback, useState, useEffect, memo } from 'react';
 import {
     Play, SkipForward, SkipBack, Pause, Volume2, Volume1, VolumeX, Music2, Video, ChevronUp
@@ -15,7 +16,6 @@ interface BottomPlayerProps {
     onToggleMode: (mode: AudioMode) => void;
     onExpand: () => void;
     progress: number;
-    setProgress: (val: number) => void;
     volume: number;
     setVolume: (val: number) => void;
 }
@@ -30,20 +30,20 @@ const BottomPlayer: React.FC<BottomPlayerProps> = ({
     onToggleMode,
     onExpand,
     progress,
-    setProgress,
     volume,
     setVolume,
 }) => {
     const progressRef = useRef<HTMLDivElement>(null);
     const [isScrubbing, setIsScrubbing] = useState(false);
+    const [scrubProgress, setScrubProgress] = useState(0);
 
     const handleScrub = useCallback((clientX: number) => {
         if (!progressRef.current) return;
         const rect = progressRef.current.getBoundingClientRect();
         const x = clientX - rect.left;
         const newProgress = Math.max(0, Math.min(1, x / rect.width));
-        setProgress(newProgress);
-    }, [setProgress]);
+        setScrubProgress(newProgress);
+    }, []);
 
     const handleScrubMouseDown = useCallback((e: React.MouseEvent) => {
         e.preventDefault();
@@ -68,6 +68,8 @@ const BottomPlayer: React.FC<BottomPlayerProps> = ({
         };
     }, [isScrubbing, handleScrub]);
 
+    const displayProgress = isScrubbing ? scrubProgress : progress;
+
     const renderVolumeIcon = useCallback(() => {
         if (volume === 0) return <VolumeX size={20} />;
         if (volume < 0.5) return <Volume1 size={20} />;
@@ -87,7 +89,7 @@ const BottomPlayer: React.FC<BottomPlayerProps> = ({
             >
                 <div
                     className="h-full bg-red-600 relative transition-all duration-150"
-                    style={{ width: `${progress * 100}%` }}
+                    style={{ width: `${displayProgress * 100}%` }}
                 >
                     <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-red-500 rounded-full opacity-0 group-hover:opacity-100 transition-opacity" />
                 </div>
