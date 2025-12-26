@@ -43,7 +43,7 @@ const TimeBasedRecommendations: React.FC<TimeBasedRecommendationsProps> = ({ rec
                 />
                 
                 {/* Gradient Overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-t ${recommendations.color} via-black/20 to-transparent opacity-80 group-hover:opacity-70 transition-opacity`} />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent transition-opacity" />
                 
                 {/* Content Overlay */}
                 <div className="absolute inset-0 p-5 flex flex-col justify-between z-10">
