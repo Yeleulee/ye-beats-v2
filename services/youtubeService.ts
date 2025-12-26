@@ -1,4 +1,5 @@
 import { apiKeyManager, makeAPIRequest } from '../utils/apiKeyManager';
+import { getFromCache, setInCache } from '../utils/cache';
 
 export interface YouTubeTrack {
   id: string;
@@ -63,6 +64,14 @@ async function handleResponse(response: Response) {
 async function fetchVideoDetails(videoIds: string[]): Promise<Map<string, number>> {
   if (videoIds.length === 0) return new Map();
 
+  const cacheKey = `videoDetails:${videoIds.join(',')}`;
+  const cachedData = getFromCache<[string, number][]>(cacheKey);
+  if (cachedData) {
+    console.log(`CACHE HIT: ${cacheKey}`);
+    return new Map(cachedData);
+  }
+  console.log(`CACHE MISS: ${cacheKey}`);
+
   const result = await makeAPIRequest(async (apiKey) => {
     const response = await fetch(
       `https://www.googleapis.com/youtube/v3/videos?` +
@@ -79,6 +88,7 @@ async function fetchVideoDetails(videoIds: string[]): Promise<Map<string, number
     });
   }
 
+  setInCache(cacheKey, Array.from(durationMap.entries()));
   return durationMap;
 }
 
@@ -86,6 +96,14 @@ async function fetchVideoDetails(videoIds: string[]): Promise<Map<string, number
  * Fetch popular Ethiopian artists
  */
 export async function fetchEthiopianArtists(): Promise<Artist[]> {
+  const cacheKey = 'ethiopianArtists';
+  const cachedData = getFromCache<Artist[]>(cacheKey);
+  if (cachedData) {
+    console.log(`CACHE HIT: ${cacheKey}`);
+    return cachedData;
+  }
+  console.log(`CACHE MISS: ${cacheKey}`);
+
   const ethiopianArtists = [
     'Teddy Afro',
     'Aster Aweke',
@@ -118,6 +136,7 @@ export async function fetchEthiopianArtists(): Promise<Artist[]> {
     }
   }
 
+  setInCache(cacheKey, artists);
   return artists;
 }
 
@@ -125,6 +144,14 @@ export async function fetchEthiopianArtists(): Promise<Artist[]> {
  * Fetch popular international artists
  */
 export async function fetchPopularArtists(): Promise<Artist[]> {
+  const cacheKey = 'popularArtists';
+  const cachedData = getFromCache<Artist[]>(cacheKey);
+  if (cachedData) {
+    console.log(`CACHE HIT: ${cacheKey}`);
+    return cachedData;
+  }
+  console.log(`CACHE MISS: ${cacheKey}`);
+
   const popularArtists = [
     'The Weeknd',
     'Drake',
@@ -157,6 +184,7 @@ export async function fetchPopularArtists(): Promise<Artist[]> {
     }
   }
 
+  setInCache(cacheKey, artists);
   return artists;
 }
 
@@ -164,6 +192,14 @@ export async function fetchPopularArtists(): Promise<Artist[]> {
  * Fetch popular tracks from an artist
  */
 export async function fetchArtistTracks(artistName: string, maxResults = 10): Promise<YouTubeTrack[]> {
+  const cacheKey = `artistTracks:${artistName}:${maxResults}`;
+  const cachedData = getFromCache<YouTubeTrack[]>(cacheKey);
+  if (cachedData) {
+    console.log(`CACHE HIT: ${cacheKey}`);
+    return cachedData;
+  }
+  console.log(`CACHE MISS: ${cacheKey}`);
+
   // 1. Search for videos
   const result = await makeAPIRequest(async (apiKey) => {
     const response = await fetch(
@@ -180,7 +216,7 @@ export async function fetchArtistTracks(artistName: string, maxResults = 10): Pr
   const videoIds = result.items.map((item: any) => item.id.videoId).filter(Boolean);
   const durationMap = await fetchVideoDetails(videoIds);
 
-  return result.items.map((item: any) => ({
+  const tracks = result.items.map((item: any) => ({
     id: item.id.videoId,
     title: item.snippet.title,
     artist: item.snippet.channelTitle,
@@ -190,12 +226,23 @@ export async function fetchArtistTracks(artistName: string, maxResults = 10): Pr
     videoId: item.id.videoId,
     channelId: item.snippet.channelId,
   }));
+
+  setInCache(cacheKey, tracks);
+  return tracks;
 }
 
 /**
  * Fetch popular podcasts from Ethiopia
  */
 export async function fetchEthiopianPodcasts(): Promise<Podcast[]> {
+  const cacheKey = 'ethiopianPodcasts';
+  const cachedData = getFromCache<Podcast[]>(cacheKey);
+  if (cachedData) {
+    console.log(`CACHE HIT: ${cacheKey}`);
+    return cachedData;
+  }
+  console.log(`CACHE MISS: ${cacheKey}`);
+  
   const ethiopianPodcasts = [
     'Seifu on EBS',
     'Zehabesha',
@@ -245,6 +292,7 @@ export async function fetchEthiopianPodcasts(): Promise<Podcast[]> {
     }
   }
 
+  setInCache(cacheKey, podcasts);
   return podcasts;
 }
 
@@ -252,6 +300,14 @@ export async function fetchEthiopianPodcasts(): Promise<Podcast[]> {
  * Fetch popular international podcasts
  */
 export async function fetchPopularPodcasts(): Promise<Podcast[]> {
+  const cacheKey = 'popularPodcasts';
+  const cachedData = getFromCache<Podcast[]>(cacheKey);
+  if (cachedData) {
+    console.log(`CACHE HIT: ${cacheKey}`);
+    return cachedData;
+  }
+  console.log(`CACHE MISS: ${cacheKey}`);
+
   const popularPodcasts = [
     'Joe Rogan Experience',
     'The Daily',
@@ -301,6 +357,7 @@ export async function fetchPopularPodcasts(): Promise<Podcast[]> {
     }
   }
 
+  setInCache(cacheKey, podcasts);
   return podcasts;
 }
 
@@ -308,6 +365,14 @@ export async function fetchPopularPodcasts(): Promise<Podcast[]> {
  * Fetch trending music globally
  */
 export async function fetchTrendingMusic(maxResults = 20): Promise<YouTubeTrack[]> {
+  const cacheKey = `trendingMusic:${maxResults}`;
+  const cachedData = getFromCache<YouTubeTrack[]>(cacheKey);
+  if (cachedData) {
+    console.log(`CACHE HIT: ${cacheKey}`);
+    return cachedData;
+  }
+  console.log(`CACHE MISS: ${cacheKey}`);
+  
   const result = await makeAPIRequest(async (apiKey) => {
     // Added 'contentDetails' to part
     const response = await fetch(
@@ -320,7 +385,7 @@ export async function fetchTrendingMusic(maxResults = 20): Promise<YouTubeTrack[
 
   if (!result?.items) return [];
 
-  return result.items.map((item: any) => ({
+  const tracks = result.items.map((item: any) => ({
     id: item.id,
     title: item.snippet.title,
     artist: item.snippet.channelTitle,
@@ -330,12 +395,23 @@ export async function fetchTrendingMusic(maxResults = 20): Promise<YouTubeTrack[
     videoId: item.id,
     channelId: item.snippet.channelId,
   }));
+
+  setInCache(cacheKey, tracks);
+  return tracks;
 }
 
 /**
  * Search for music
  */
 export async function searchMusic(query: string, maxResults = 10): Promise<YouTubeTrack[]> {
+  const cacheKey = `searchMusic:${query}:${maxResults}`;
+  const cachedData = getFromCache<YouTubeTrack[]>(cacheKey);
+  if (cachedData) {
+    console.log(`CACHE HIT: ${cacheKey}`);
+    return cachedData;
+  }
+  console.log(`CACHE MISS: ${cacheKey}`);
+
   const result = await makeAPIRequest(async (apiKey) => {
     const response = await fetch(
       `https://www.googleapis.com/youtube/v3/search?` +
@@ -351,7 +427,7 @@ export async function searchMusic(query: string, maxResults = 10): Promise<YouTu
   const videoIds = result.items.map((item: any) => item.id.videoId).filter(Boolean);
   const durationMap = await fetchVideoDetails(videoIds);
 
-  return result.items.map((item: any) => ({
+  const tracks = result.items.map((item: any) => ({
     id: item.id.videoId,
     title: item.snippet.title,
     artist: item.snippet.channelTitle,
@@ -361,6 +437,9 @@ export async function searchMusic(query: string, maxResults = 10): Promise<YouTu
     videoId: item.id.videoId,
     channelId: item.snippet.channelId,
   }));
+
+  setInCache(cacheKey, tracks);
+  return tracks;
 }
 
 /**
