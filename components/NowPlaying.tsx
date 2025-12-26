@@ -1,11 +1,11 @@
 
-import React, { useState, useRef, useCallback, useEffect, memo } from 'react';
+import React, { memo, useCallback, useRef } from 'react';
+import YouTube from 'react-youtube';
 import {
-  ChevronDown, MoreHorizontal, Share2, Music2, Video, Play, Pause, SkipBack, SkipForward, Repeat,
-  Shuffle, Repeat1, Volume2, Volume1, VolumeX, ListMusic, X, Zap, Gauge, Radio, Airplay
+  Airplay, ChevronDown, ListMusic, MoreHorizontal, Music2, Pause, Play, Repeat, Repeat1, Share2, Shuffle, SkipBack, SkipForward, Video, Volume1, Volume2, VolumeX, X
 } from 'lucide-react';
-import { Track, AudioMode } from '../types';
 import { cn } from '../lib/utils';
+import { AudioMode, Track } from '../types';
 
 interface NowPlayingProps {
   track: Track;
@@ -30,6 +30,7 @@ interface NowPlayingProps {
   onJumpToTrack: (track: Track) => void;
   playbackSpeed: number;
   setPlaybackSpeed: (speed: number) => void;
+  playerRef: React.MutableRefObject<any>;
 }
 
 const QueueItem = memo<{
@@ -81,9 +82,10 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
   queue,
   removeFromQueue,
   onJumpToTrack,
+  playerRef,
 }) => {
   const progressRef = useRef<HTMLDivElement>(null);
-  const volumeRef = useRef<HTMLDivElement>('null');
+  const volumeRef = useRef<HTMLDivElement>(null);
 
   const handleScrub = useCallback((e: React.MouseEvent) => {
     if (!progressRef.current) return;
@@ -133,32 +135,35 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
         </button>
 
         <div className="w-full lg:w-[calc(50%-0.75rem)] h-1/2 lg:h-full flex flex-col items-center justify-center bg-black/20 rounded-2xl p-8 relative overflow-hidden">
-            <div className="aspect-video w-full max-w-2xl relative">
-                {audioMode === AudioMode.VIDEO ? (
-                    <p className="text-white">Video Player would be here</p>
-                ) : (
-                    <img src={track.coverArt} alt={track.title} className="w-full h-full object-contain rounded-lg shadow-2xl" />
-                )}
-            </div>
-             <div className="absolute bottom-6 right-6 flex items-center gap-2 rounded-full bg-black/40 border border-white/10 p-2">
+            <div className={cn("absolute top-6 left-6 flex items-center gap-2 rounded-full bg-black/40 border-white/10 p-2 z-10", audioMode === AudioMode.VIDEO && "bg-transparent border-none")}>
                 <button
                     onClick={() => onToggleMode(AudioMode.OFFICIAL)}
                     className={cn(
-                        "px-4 py-2 rounded-full text-xs font-bold transition-colors",
-                        audioMode === AudioMode.OFFICIAL ? 'bg-red-600 text-white' : 'text-zinc-300 hover:bg-white/10'
+                        "px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2",
+                        audioMode === AudioMode.OFFICIAL ? 'bg-red-600 text-white shadow-lg' : 'text-zinc-300 hover:bg-white/10'
                     )}
                 >
-                    <Music2 size={16} />
+                    <Music2 size={14} />
+                    <span>Music</span>
                 </button>
                 <button
                     onClick={() => onToggleMode(AudioMode.VIDEO)}
                     className={cn(
-                        "px-4 py-2 rounded-full text-xs font-bold transition-colors",
-                        audioMode === AudioMode.VIDEO ? 'bg-red-600 text-white' : 'text-zinc-300 hover:bg-white/10'
+                        "px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2",
+                        audioMode === AudioMode.VIDEO ? 'bg-red-600 text-white shadow-lg' : 'text-zinc-300 hover:bg-white/10'
                     )}
                 >
-                    <Video size={16} />
+                    <Video size={14} />
+                    <span>Video</span>
                 </button>
+            </div>
+            <div className="aspect-video w-full max-w-2xl relative">
+                 <div className={cn("w-full h-full transition-opacity duration-500", audioMode === AudioMode.OFFICIAL ? 'opacity-100' : 'opacity-0')}>
+                    <img src={track.coverArt} alt={track.title} className="w-full h-full object-contain rounded-lg shadow-2xl" />
+                </div>
+                <div className={cn("absolute inset-0 w-full h-full transition-opacity duration-500", audioMode === AudioMode.VIDEO ? 'opacity-100' : 'opacity-0')}>
+                    {playerRef.current && <YouTube videoId={track.id} className="w-full h-full" opts={{ width: '100%', height: '100%' }} />}
+                </div>
             </div>
         </div>
 
@@ -226,7 +231,7 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
                             track={t}
                             onPlay={() => onJumpToTrack(t)}
                             onRemove={() => removeFromQueue(t.id)}
-                            isPlaying={false} /* This would need to be dynamic based on if it's the currently playing track in a playlist context */
+                            isPlaying={t.id === track.id && isPlaying}
                         />
                     ))}
                     {queue.length === 0 && (

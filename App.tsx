@@ -17,7 +17,7 @@ import YouTube from 'react-youtube';
 const App: React.FC = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState<User | null>(null);
-  const [currentTrack, setCurrentTrack] = useState<Track>(MOCK_TRACKS[0]);
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioMode, setAudioMode] = useState<AudioMode>(AudioMode.OFFICIAL);
   const [isExpanded, setIsExpanded] = useState(false);
@@ -58,11 +58,18 @@ const App: React.FC = () => {
   };
 
   const handleTrackSelect = (track: Track, tracks: Track[] = []) => {
-    setQueue(tracks.length > 0 ? tracks : [track, ...queue.filter(t => t.id !== track.id)]);
+    if (tracks.length > 0) {
+      setQueue(tracks);
+      setOriginalQueue(tracks);
+    } else if (!queue.some(t => t.id === track.id)) {
+      const newQueue = [track, ...queue];
+      setQueue(newQueue);
+      setOriginalQueue(newQueue);
+    }
     setCurrentTrack(track);
     setIsPlaying(true);
     setProgress(0);
-    setAutoOpenQueue(false); // Close queue when a new track is selected
+    setIsExpanded(true);
   };
 
   const handlePlayPause = () => {
@@ -70,7 +77,7 @@ const App: React.FC = () => {
   };
 
   const handleNext = useCallback(() => {
-    if (queue.length === 0) return;
+    if (!currentTrack) return;
     const currentIndex = queue.findIndex(t => t.id === currentTrack.id);
     let nextIndex;
 
@@ -80,9 +87,7 @@ const App: React.FC = () => {
       nextIndex = Math.floor(Math.random() * queue.length);
     } else {
       nextIndex = (currentIndex + 1) % queue.length;
-      if (repeatMode === 2 && nextIndex === 0 && currentIndex === queue.length - 1) {
-        // Loop back to the start
-      } else if (nextIndex === 0 && currentIndex === queue.length - 1 && repeatMode !== 2) {
+      if (repeatMode !== 2 && nextIndex === 0 && currentIndex === queue.length - 1) {
         setIsPlaying(false);
         return;
       }
@@ -93,7 +98,7 @@ const App: React.FC = () => {
   }, [queue, currentTrack, isShuffle, repeatMode]);
 
   const handlePrevious = () => {
-    if (queue.length === 0) return;
+    if (!currentTrack) return;
     const currentIndex = queue.findIndex(t => t.id === currentTrack.id);
     const prevIndex = (currentIndex - 1 + queue.length) % queue.length;
     setCurrentTrack(queue[prevIndex]);
@@ -131,7 +136,7 @@ const App: React.FC = () => {
     if (progressIntervalRef.current) {
       clearInterval(progressIntervalRef.current);
     }
-    if (isPlaying && playerRef.current && playerRef.current.getDuration) {
+    if (isPlaying && playerRef.current && typeof playerRef.current.getDuration === 'function') {
       progressIntervalRef.current = window.setInterval(() => {
         const duration = playerRef.current.getDuration();
         const currentTime = playerRef.current.getCurrentTime();
@@ -149,7 +154,7 @@ const App: React.FC = () => {
   }, [isPlaying]);
 
   useEffect(() => {
-    if (!playerRef.current) return;
+    if (!playerRef.current || typeof playerRef.current.playVideo !== 'function') return;
     if (isPlaying) {
       playerRef.current.playVideo();
     } else {
@@ -162,41 +167,52 @@ const App: React.FC = () => {
     setIsShuffle(newShuffleState);
     if (newShuffleState) {
       const shuffled = [...queue].sort(() => Math.random() - 0.5);
-      const currentTrackIndex = shuffled.findIndex(t => t.id === currentTrack.id);
-      if (currentTrackIndex > -1) {
-        // Move current track to the top
-        const [track] = shuffled.splice(currentTrackIndex, 1);
-        shuffled.unshift(track);
+      if (currentTrack) {
+        const currentTrackIndex = shuffled.findIndex(t => t.id === currentTrack.id);
+        if (currentTrackIndex > -1) {
+          const [track] = shuffled.splice(currentTrackIndex, 1);
+          shuffled.unshift(track);
+        }
       }
       setQueue(shuffled);
     } else {
-      // Return to original order, keeping current track at its position if possible
-      const originalIndex = originalQueue.findIndex(t => t.id === currentTrack.id);
-      if (originalIndex > -1) {
-        const reordered = [...originalQueue];
-        setCurrentTrack(reordered[originalIndex]);
-        setQueue(reordered);
-      } else {
-        setQueue(originalQueue);
-      }
+      setQueue(originalQueue);
     }
   };
   
   const addToQueue = (track: Track) => {
     if (!queue.find(t => t.id === track.id)) {
-      setQueue([...queue, track]);
+      const newQueue = [...queue, track];
+      setQueue(newQueue);
+      if (!isShuffle) {
+        setOriginalQueue(newQueue);
+      }
     }
   };
 
   const playNext = (track: Track) => {
+    if (!currentTrack) {
+      handleTrackSelect(track, [track]);
+      return;
+    }
     const currentIndex = queue.findIndex(t => t.id === currentTrack.id);
     const newQueue = [...queue];
     newQueue.splice(currentIndex + 1, 0, track);
     setQueue(newQueue);
+    if (!isShuffle) {
+      setOriginalQueue(newQueue);
+    }
   };
 
   const removeFromQueue = (id: string) => {
-    setQueue(queue.filter(t => t.id !== id));
+    if (currentTrack?.id === id) {
+      handleNext();
+    }
+    const newQueue = queue.filter(t => t.id !== id);
+    setQueue(newQueue);
+    if (!isShuffle) {
+      setOriginalQueue(newQueue);
+    }
   };
 
   const jumpToTrack = (track: Track) => {
@@ -212,7 +228,7 @@ const App: React.FC = () => {
   const renderContent = () => {
     switch (activeTab) {
       case 'home':
-        return <HomeContent onTrackSelect={(track, tracks) => handleTrackSelect(track, tracks)} onAddToQueue={addToQueue} onPlayNext={playNext} onLogout={handleLogout} />;
+        return <HomeContent onTrackSelect={handleTrackSelect} onAddToQueue={addToQueue} onPlayNext={playNext} onLogout={handleLogout} />;
       case 'search':
         return <SearchContent onTrackSelect={handleTrackSelect} />;
       case 'new':
@@ -245,7 +261,7 @@ const App: React.FC = () => {
                 onNext={handleNext}
                 onPrevious={handlePrevious}
                 progress={progress}
-                setProgress={setProgress} // This needs careful handling
+                setProgress={setProgress}
                 volume={volume}
                 setVolume={setVolume}
                 isShuffle={isShuffle}
@@ -258,24 +274,27 @@ const App: React.FC = () => {
                 onJumpToTrack={jumpToTrack}
                 playbackSpeed={playbackSpeed}
                 setPlaybackSpeed={setPlaybackSpeed}
+                playerRef={playerRef}
             />
           </div>
         )}
       </main>
-      <YouTube 
-        videoId={currentTrack?.id}
-        opts={{
-          height: '0',
-          width: '0',
-          playerVars: {
-            autoplay: 1,
-            controls: 0,
-          },
-        }}
-        onReady={handlePlayerReady}
-        onStateChange={handlePlayerStateChange}
-        className="hidden"
-      />
+      <div className="hidden">
+        <YouTube 
+          videoId={currentTrack?.id}
+          opts={{
+            height: '0',
+            width: '0',
+            playerVars: {
+              autoplay: 1,
+              controls: 0,
+            },
+          }}
+          onReady={handlePlayerReady}
+          onStateChange={handlePlayerStateChange}
+          key={currentTrack?.id} // Add key to force re-render on track change
+        />
+      </div>
     </div>
   );
 };
