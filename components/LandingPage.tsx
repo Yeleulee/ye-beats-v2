@@ -1,14 +1,14 @@
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Sparkles, Play, Music, Video, ArrowRight, User, Lock, Mail, Globe, Zap, Headphones, Activity } from 'lucide-react';
+import { Sparkles, Play, Music, Video, ArrowRight, User, Globe, Zap, Headphones } from 'lucide-react';
 import { AnimatedArtists } from './ui/animated-artists';
+import { signInWithGoogle } from '../services/firebase';
 
 interface LandingPageProps {
   onLogin: () => void;
 }
 
 const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
-  const [isLoginView, setIsLoginView] = useState(true);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -20,9 +20,18 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, []);
 
-  const scrollToAuth = () => {
-    const el = document.getElementById('auth-section');
-    el?.scrollIntoView({ behavior: 'smooth' });
+  const handleJoinClick = () => {
+    signInWithGoogle().then((result) => {
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const credential = result.user;
+      console.log({ credential });
+      onLogin();
+    }).catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.error({ errorCode, errorMessage });
+    });
   };
 
   // Artist data
@@ -105,13 +114,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
           <div className="h-6 w-px bg-white/10 mx-2" />
           <div className="flex items-center gap-4">
             <button 
-              onClick={() => { setIsLoginView(true); scrollToAuth(); }}
-              className="px-6 py-2.5 text-[11px] font-black uppercase tracking-[0.4em] text-zinc-400 hover:text-white transition-all font-['Roboto_Flex']"
-            >
-              Sign In
-            </button>
-            <button 
-              onClick={() => { setIsLoginView(false); scrollToAuth(); }}
+              onClick={handleJoinClick}
               className="px-8 py-3 bg-white text-black rounded-full text-[11px] font-black uppercase tracking-[0.4em] hover:scale-105 active:scale-95 transition-all shadow-xl font-['Roboto_Flex']"
             >
               Join
@@ -119,7 +122,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
           </div>
         </div>
         <button 
-          onClick={scrollToAuth}
+          onClick={handleJoinClick}
           className="md:hidden p-3 bg-white/10 rounded-full text-white"
         >
           <User size={20} />
@@ -141,7 +144,7 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
           </p>
           <div className="flex flex-col sm:flex-row gap-4 md:gap-6 animate-in fade-in slide-in-from-bottom-10 duration-1000 delay-400">
             <button 
-              onClick={scrollToAuth}
+              onClick={handleJoinClick}
               className="px-8 md:px-12 lg:px-14 py-4 md:py-5 lg:py-6 bg-white text-black rounded-full font-black text-sm md:text-base lg:text-lg hover:scale-105 active:scale-95 transition-all shadow-[0_20px_40px_rgba(255,255,255,0.15)] flex items-center justify-center gap-3 md:gap-4 group relative overflow-hidden font-['Roboto_Flex'] uppercase tracking-wider"
             >
               Get Started Free
@@ -210,80 +213,6 @@ const LandingPage: React.FC<LandingPageProps> = ({ onLogin }) => {
           </p>
         </div>
         <AnimatedArtists artists={artists} autoplay={true} />
-      </section>
-
-      {/* Auth Section */}
-      <section id="auth-section" className="py-24 md:py-32 lg:py-48 px-6 lg:px-12 z-10 relative flex flex-col items-center">
-        <div className="w-full max-w-2xl bg-[#0a0a0a] border border-white/10 rounded-[40px] md:rounded-[56px] lg:rounded-[64px] p-8 md:p-12 lg:p-16 xl:p-20 shadow-[0_60px_120px_-30px_rgba(0,0,0,1)] relative overflow-hidden group">
-          <div className="absolute top-0 right-0 w-60 h-60 md:w-80 md:h-80 bg-red-600/5 blur-[100px] -translate-y-1/2 translate-x-1/2" />
-          
-          <div className="relative z-10">
-            <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-black tracking-tighter mb-4 md:mb-6 text-center text-white font-['Inter'] uppercase leading-none">
-              {isLoginView ? 'Welcome.' : 'The Era.'}
-            </h2>
-            <p className="text-zinc-500 text-center mb-10 md:mb-12 lg:mb-16 font-medium text-base md:text-lg lg:text-xl font-['Roboto_Flex'] tracking-tight">
-              {isLoginView ? 'Your library is waiting.' : 'Step into the evolution of audio.'}
-            </p>
-
-            <form className="space-y-6 md:space-y-8" onSubmit={(e) => { e.preventDefault(); onLogin(); }}>
-              {!isLoginView && (
-                <div className="space-y-2 md:space-y-3">
-                  <label className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] md:tracking-[0.5em] text-zinc-600 ml-4 md:ml-6 font-['Roboto_Flex']">Full Name</label>
-                  <div className="relative group/input">
-                    <User className="absolute left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 text-zinc-700 group-focus-within/input:text-red-500 transition-colors" size={20} />
-                    <input 
-                      type="text" 
-                      placeholder="Liam Beats"
-                      className="w-full bg-black border border-white/5 px-14 md:px-16 lg:px-20 py-4 md:py-5 lg:py-6 rounded-2xl md:rounded-3xl lg:rounded-[32px] focus:outline-none focus:ring-4 focus:ring-red-600/10 transition-all text-base md:text-lg lg:text-xl text-white placeholder:text-zinc-800 font-['Roboto_Flex']"
-                      required
-                    />
-                  </div>
-                </div>
-              )}
-              <div className="space-y-2 md:space-y-3">
-                <label className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] md:tracking-[0.5em] text-zinc-600 ml-4 md:ml-6 font-['Roboto_Flex']">Email</label>
-                <div className="relative group/input">
-                  <Mail className="absolute left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 text-zinc-700 group-focus-within/input:text-red-500 transition-colors" size={20} />
-                  <input 
-                    type="email" 
-                    placeholder="liam@yebeats.io"
-                    className="w-full bg-black border border-white/5 px-14 md:px-16 lg:px-20 py-4 md:py-5 lg:py-6 rounded-2xl md:rounded-3xl lg:rounded-[32px] focus:outline-none focus:ring-4 focus:ring-red-600/10 transition-all text-base md:text-lg lg:text-xl text-white placeholder:text-zinc-800 font-['Roboto_Flex']"
-                    required
-                  />
-                </div>
-              </div>
-              <div className="space-y-2 md:space-y-3">
-                <label className="text-[10px] md:text-[11px] font-black uppercase tracking-[0.3em] md:tracking-[0.5em] text-zinc-600 ml-4 md:ml-6 font-['Roboto_Flex']">Password</label>
-                <div className="relative group/input">
-                  <Lock className="absolute left-4 md:left-6 lg:left-8 top-1/2 -translate-y-1/2 text-zinc-700 group-focus-within/input:text-red-500 transition-colors" size={20} />
-                  <input 
-                    type="password" 
-                    placeholder="••••••••"
-                    className="w-full bg-black border border-white/5 px-14 md:px-16 lg:px-20 py-4 md:py-5 lg:py-6 rounded-2xl md:rounded-3xl lg:rounded-[32px] focus:outline-none focus:ring-4 focus:ring-red-600/10 transition-all text-base md:text-lg lg:text-xl text-white placeholder:text-zinc-800 font-['Roboto_Flex']"
-                    required
-                  />
-                </div>
-              </div>
-
-              <button 
-                type="submit"
-                className="w-full py-5 md:py-6 lg:py-7 bg-white text-black rounded-2xl md:rounded-3xl lg:rounded-[32px] font-black text-base md:text-lg lg:text-xl hover:scale-[1.02] active:scale-[0.98] transition-all shadow-[0_20px_40px_rgba(255,255,255,0.12)] mt-8 md:mt-10 lg:mt-12 font-['Roboto_Flex'] uppercase tracking-wider"
-              >
-                {isLoginView ? 'LOG IN' : 'CREATE ACCOUNT'}
-              </button>
-            </form>
-
-            <div className="mt-10 md:mt-12 lg:mt-16 pt-8 md:pt-10 border-t border-white/5 text-center">
-              <button 
-                onClick={() => setIsLoginView(!isLoginView)}
-                className="text-sm md:text-base lg:text-lg font-bold text-zinc-500 hover:text-white transition-colors flex items-center justify-center gap-2 md:gap-3 mx-auto font-['Roboto_Flex'] tracking-tight"
-              >
-                {isLoginView ? "New here? Build your library" : "Already a super-fan? Log In"}
-                <ArrowRight size={18} />
-              </button>
-            </div>
-          </div>
-        </div>
       </section>
 
       {/* Footer */}
