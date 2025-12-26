@@ -1,5 +1,5 @@
 
-import React, { memo, useCallback, useRef } from 'react';
+import React, { memo, useCallback, useRef, useEffect } from 'react';
 import YouTube from 'react-youtube';
 import {
   Airplay, ChevronDown, ListMusic, MoreHorizontal, Music2, Pause, Play, Repeat, Repeat1, Share2, Shuffle, SkipBack, SkipForward, Video, Volume1, Volume2, VolumeX, X
@@ -9,28 +9,12 @@ import { AudioMode, Track } from '../types';
 
 interface NowPlayingProps {
   track: Track;
-  audioMode: AudioMode;
-  onToggleMode: (mode: AudioMode) => void;
   onClose: () => void;
-  isPlaying: boolean;
-  onPlayPause: () => void;
+  queue: Track[];
+  onJumpToTrack: (track: Track) => void;
   onNext: () => void;
   onPrevious: () => void;
-  progress: number;
-  setProgress: (val: number) => void;
-  volume: number;
-  setVolume: (val: number) => void;
-  isShuffle: boolean;
-  setIsShuffle: (val: boolean) => void;
-  repeatMode: 0 | 1 | 2;
-  setRepeatMode: (val: 0 | 1 | 2) => void;
-  queue: Track[];
   removeFromQueue: (id: string) => void;
-  playNext: (track: Track) => void;
-  onJumpToTrack: (track: Track) => void;
-  playbackSpeed: number;
-  setPlaybackSpeed: (speed: number) => void;
-  playerRef: React.MutableRefObject<any>;
 }
 
 const QueueItem = memo<{
@@ -64,36 +48,36 @@ const QueueItem = memo<{
 
 const NowPlaying: React.FC<NowPlayingProps> = ({
   track,
-  audioMode,
-  onToggleMode,
   onClose,
-  isPlaying,
-  onPlayPause,
+  queue,
+  onJumpToTrack,
   onNext,
   onPrevious,
-  progress,
-  setProgress,
-  volume,
-  setVolume,
-  isShuffle,
-  setIsShuffle,
-  repeatMode,
-  setRepeatMode,
-  queue,
-  removeFromQueue,
-  onJumpToTrack,
-  playerRef,
+  removeFromQueue
 }) => {
+  const [isPlaying, setIsPlaying] = useState(true);
+  const [audioMode, setAudioMode] = useState<AudioMode>(AudioMode.OFFICIAL);
+  const [progress, setProgress] = useState(0);
+  const [volume, setVolume] = useState(0.8);
+  const [isShuffle, setIsShuffle] = useState(false);
+  const [repeatMode, setRepeatMode] = useState<0 | 1 | 2>(0);
+  const [playbackSpeed, setPlaybackSpeed] = useState<number>(1);
+  const playerRef = useRef<any>(null);
+  const progressIntervalRef = useRef<number | null>(null);
+
   const progressRef = useRef<HTMLDivElement>(null);
   const volumeRef = useRef<HTMLDivElement>(null);
 
+  const handlePlayPause = () => setIsPlaying(!isPlaying);
+
   const handleScrub = useCallback((e: React.MouseEvent) => {
-    if (!progressRef.current) return;
+    if (!progressRef.current || !playerRef.current) return;
     const rect = progressRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const newProgress = Math.max(0, Math.min(1, x / rect.width));
+    playerRef.current.seekTo(newProgress * track.duration);
     setProgress(newProgress);
-  }, [setProgress]);
+  }, [track.duration]);
   
   const handleVolumeScrub = useCallback((e: React.MouseEvent) => {
     if(!volumeRef.current) return;
@@ -121,8 +105,81 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
     return <Volume2 size={20} />;
   };
 
+  const handlePlayerReady = (event: any) => {
+    playerRef.current = event.target;
+    playerRef.current.setVolume(volume * 100);
+    playerRef.current.setPlaybackRate(playbackSpeed);
+    if (isPlaying) {
+      playerRef.current.playVideo();
+    }
+  };
+
+  const handlePlayerStateChange = (event: any) => {
+    if (event.data === YouTube.PlayerState.ENDED) {
+      onNext();
+    } 
+  };
+
+  useEffect(() => {
+    if (playerRef.current && playerRef.current.setVolume) {
+      playerRef.current.setVolume(volume * 100);
+    }
+  }, [volume]);
+
+  useEffect(() => {
+    if (playerRef.current && playerRef.current.setPlaybackRate) {
+      playerRef.current.setPlaybackRate(playbackSpeed);
+    }
+  }, [playbackSpeed]);
+
+  useEffect(() => {
+    if (progressIntervalRef.current) {
+      clearInterval(progressIntervalRef.current);
+    }
+    if (isPlaying && playerRef.current && typeof playerRef.current.getDuration === 'function') {
+      progressIntervalRef.current = window.setInterval(() => {
+        const duration = playerRef.current.getDuration();
+        const currentTime = playerRef.current.getCurrentTime();
+        if (duration > 0) {
+          setProgress(currentTime / duration);
+        }
+      }, 1000);
+    } 
+
+    return () => {
+      if (progressIntervalRef.current) {
+        clearInterval(progressIntervalRef.current);
+      }
+    };
+  }, [isPlaying]);
+
+  useEffect(() => {
+    if (!playerRef.current || typeof playerRef.current.playVideo !== 'function') return;
+    if (isPlaying) {
+      playerRef.current.playVideo();
+    } else {
+      playerRef.current.pauseVideo();
+    }
+  }, [isPlaying, track]);
+
   return (
     <div className="fixed inset-0 bg-black z-[100] animate-in slide-in-from-bottom-4 duration-500 flex flex-col font-['Inter']">
+       <div className="hidden">
+        <YouTube 
+          videoId={track?.id}
+          opts={{
+            height: '0',
+            width: '0',
+            playerVars: {
+              autoplay: 1,
+              controls: 0,
+            },
+          }}
+          onReady={handlePlayerReady}
+          onStateChange={handlePlayerStateChange}
+          key={track?.id}
+        />
+      </div>
       <div
         className="absolute inset-0 opacity-20 blur-[100px] scale-110"
         style={{ backgroundImage: `url(${track.coverArt})`, backgroundSize: 'cover', backgroundPosition: 'center' }}
@@ -137,7 +194,7 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
         <div className="w-full lg:w-[calc(50%-0.75rem)] h-1/2 lg:h-full flex flex-col items-center justify-center bg-black/20 rounded-2xl p-8 relative overflow-hidden">
             <div className={cn("absolute top-6 left-6 flex items-center gap-2 rounded-full bg-black/40 border-white/10 p-2 z-10", audioMode === AudioMode.VIDEO && "bg-transparent border-none")}>
                 <button
-                    onClick={() => onToggleMode(AudioMode.OFFICIAL)}
+                    onClick={() => setAudioMode(AudioMode.OFFICIAL)}
                     className={cn(
                         "px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2",
                         audioMode === AudioMode.OFFICIAL ? 'bg-red-600 text-white shadow-lg' : 'text-zinc-300 hover:bg-white/10'
@@ -147,7 +204,7 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
                     <span>Music</span>
                 </button>
                 <button
-                    onClick={() => onToggleMode(AudioMode.VIDEO)}
+                    onClick={() => setAudioMode(AudioMode.VIDEO)}
                     className={cn(
                         "px-4 py-2 rounded-full text-xs font-bold transition-all flex items-center gap-2",
                         audioMode === AudioMode.VIDEO ? 'bg-red-600 text-white shadow-lg' : 'text-zinc-300 hover:bg-white/10'
@@ -162,7 +219,7 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
                     <img src={track.coverArt} alt={track.title} className="w-full h-full object-contain rounded-lg shadow-2xl" />
                 </div>
                 <div className={cn("absolute inset-0 w-full h-full transition-opacity duration-500", audioMode === AudioMode.VIDEO ? 'opacity-100' : 'opacity-0')}>
-                    {playerRef.current && <YouTube videoId={track.id} className="w-full h-full" opts={{ width: '100%', height: '100%' }} />}
+                   <YouTube videoId={track.id} className="w-full h-full" opts={{ width: '100%', height: '100%', playerVars: { autoplay: 1 } }} />
                 </div>
             </div>
         </div>
@@ -197,7 +254,7 @@ const NowPlaying: React.FC<NowPlayingProps> = ({
                     <Shuffle size={20} />
                 </button>
                 <button onClick={onPrevious} className="p-3 text-white"><SkipBack size={32} fill="currentColor" /></button>
-                <button onClick={onPlayPause} className="w-20 h-20 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 transition-transform">
+                <button onClick={handlePlayPause} className="w-20 h-20 bg-white text-black rounded-full flex items-center justify-center hover:scale-105 transition-transform">
                     {isPlaying ? <Pause size={32} fill="currentColor" /> : <Play size={32} fill="currentColor" className="ml-1" />}
                 </button>
                 <button onClick={onNext} className="p-3 text-white"><SkipForward size={32} fill="currentColor" /></button>
